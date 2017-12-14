@@ -1,0 +1,86 @@
+---
+title: User Profile
+layout: default
+---
+
+<!-- Main jumbotron -->
+<div class="jumbotron">
+  <h1>{{page.title}}</h1>
+
+  <p>
+    This is a template showcasing the serverless model using AWS
+    <a href="https://aws.amazon.com/s3/">S3</a>,
+    <a href="https://aws.amazon.com/lambda/">Lambda</a>,
+    <a href="https://aws.amazon.com/cognito/">Cognito
+      <a>,
+        <a href="https://aws.amazon.com/iam/">IAM</a>, and
+        <a href="https://aws.amazon.com/api-gateway/">API Gateway</a>. The template also uses
+        <a href="https://getbootstrap.com/">Bootstrap</a> and
+        <a href="http://fontawesome.io/">FontAwesome</a>. The code is based on two sample projects by AWS Labs:
+        <a href="https://github.com/awslabs/aws-serverless-workshops/tree/master/WebApplication/">Serverless Web Application Workshop</a> and
+        <a href="https://github.com/awslabs/aws-serverless-samfarm">Serverless SAM Farm</a>.
+  </p>
+  <p>
+    The documentation (i.e. setup instructions, modification details) and full source code for this site as well as the pipeline
+    that powers it is available within the GitHub repository.
+  </p>
+  <a href="https://github.com/eeg3/serverless-pipeline" class="btn btn-primary">View Source Code</a>
+  </p>
+</div>
+
+<div class="page-header">
+  <h1>User Profile</h1>
+</div>
+<div class="row">
+  <div id="samfarm" class="col-sm-12">
+    <table>
+      <tr>
+        <td>Authentication Token: </td>
+        <td>
+          <textarea class="authToken" cols="80" rows="3"></textarea>
+        </td>
+      </tr>
+    </table>
+
+  </div>
+
+</div>
+
+</div>
+
+<div id="noApiMessage" class="configMessage" style="display: none;">
+  <div class="backdrop"></div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Successfully Authenticated!</h3>
+    </div>
+    <div class="panel-body">
+      <p>This page is not functional yet because there is no API invoke URL configured in
+        <a href="/js/config.js">/js/config.js</a>.</p>
+      <p>In the meantime, in order to test the Amazon Cognito user pool authorizer for your API, use the auth token below:</p>
+      <textarea class="authToken"></textarea>
+    </div>
+  </div>
+</div>
+
+<div id="noCognitoMessage" class="configMessage" style="display: none;">
+  <div class="backdrop"></div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">No Cognito User Pool Configured</h3>
+    </div>
+    <div class="panel-body">
+      <p>There is no user pool configured in
+        <a href="/js/config.js">/js/config.js</a>.</p>
+    </div>
+  </div>
+</div>
+
+<script src="js/vendor/jquery-3.1.0.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+<script src="js/vendor/aws-cognito-sdk.min.js"></script>
+<script src="js/vendor/amazon-cognito-identity.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/cognito-auth.js"></script>
+<script src="js/profile.js"></script>

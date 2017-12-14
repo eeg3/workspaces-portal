@@ -1,0 +1,28 @@
+body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.navbar {
+  margin-bottom: 20px;
+}
+
+.theme-dropdown .dropdown-menu {
+  position: static;
+  display: block;
+  margin-bottom: 20px;
+}
+
+.theme-showcase>p>.btn {
+  margin: 5px 0;
+}
+
+#registrationForm,
+#signinForm,
+#verifyForm {
+  text-align: center
+}
+
+.authenticated {
+  display: none !important;
+}

@@ -1,0 +1,11 @@
+{
+  "name": "cognito-domainverify",
+  "version": "1.0.0",
+  "description": "Validate that AWS Cognito signup is in an approved email domain.",
+  "main": "cogDomainVerify.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Earl Gay",
+  "license": "BSD-2-Clause"
+}

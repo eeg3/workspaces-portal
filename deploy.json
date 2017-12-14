@@ -1,0 +1,731 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Description": "Foundational Services for Serverless Pipeline",
+    "Parameters": {
+        "AppName": {
+            "Type": "String",
+            "Description": "Name of the application.",
+            "MinLength": "1",
+            "MaxLength": "80",
+            "AllowedPattern": "[A-Za-z0-9-]+",
+            "ConstraintDescription": "Malformed input parameter. AppName must only contain upper and lower case letters, numbers, and -."
+        },
+        "BucketName": {
+            "Description": "Name of the new S3 Bucket to Host Site",
+            "Type": "String",
+            "Default": "eeg3-serverless-template"
+        },
+        "CognitoPool": {
+            "Description": "Name for the Cognito Pool",
+            "Type": "String",
+            "Default": "serverless-pool"
+        },
+        "SAMInputFile": {
+            "Type": "String",
+            "Description": "The filename for the serverless transform file.",
+            "Default": "sam.json"
+        },
+        "SAMOutputFile": {
+            "Type": "String",
+            "Description": "The filename for the output file from the buildspec file.",
+            "Default": "post-package.yaml"
+        },
+        "CodeBuildImage": {
+            "Type": "String",
+            "Default": "aws/codebuild/nodejs:7.0.0",
+            "Description": "Image used for CodeBuild project."
+        },
+        "GitHubRepoName": {
+            "Type": "String",
+            "Description": "The GitHub repo name"
+        },
+        "GitHubRepoBranch": {
+            "Type": "String",
+            "Description": "The GitHub repo branch code pipelines should watch for changes on",
+            "Default": "master"
+        },
+        "GitHubUser": {
+            "Type": "String",
+            "Description": "GitHub UserName. This username must have access to the GitHubToken."
+        },
+        "GitHubToken": {
+            "NoEcho": true,
+            "Type": "String",
+            "Description": "Secret. OAuthToken with access to Repo. Long string of characters and digits. Go to https://github.com/settings/tokens"
+        }
+    },
+    "Resources": {
+        "S3Bucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+                "AccessControl": "PublicRead",
+                "BucketName": {
+                    "Ref": "BucketName"
+                },
+                "WebsiteConfiguration": {
+                    "IndexDocument": "index.html"
+                }
+            },
+            "DeletionPolicy": "Retain"
+        },
+        "S3WebsiteBucketPolicy": {
+            "DependsOn": [
+                "S3Bucket"
+            ],
+            "Description": "Setting Amazon S3 bucket policy for external and AWS CodePipeline access",
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "Bucket": {
+                    "Ref": "S3Bucket"
+                },
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Id": "SSEAndSSLPolicy",
+                    "Statement": [{
+                        "Action": [
+                            "s3:GetObject"
+                        ],
+                        "Effect": "Allow",
+                        "Resource": {
+                            "Fn::Sub": "arn:aws:s3:::${S3Bucket}/*"
+                        },
+                        "Principal": "*"
+                    }]
+                }
+            }
+        },
+        "CodeBuildTrustRole": {
+            "Description": "Creating service role in IAM for AWS CodeBuild",
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "${AppName}-codebuild-role"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [
+                                "codebuild.amazonaws.com"
+                            ]
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Path": "/"
+            }
+        },
+        "CodeBuildRolePolicy": {
+            "Type": "AWS::IAM::Policy",
+            "DependsOn": "CodeBuildTrustRole",
+            "Description": "Setting IAM policy for the service role for AWS CodeBuild",
+            "Properties": {
+                "PolicyName": "CodeBuildRolePolicy",
+                "PolicyDocument": {
+                    "Statement": [{
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogGroup",
+                                "logs:CreateLogStream",
+                                "logs:PutLogEvents"
+                            ],
+                            "Resource": [
+                                "*"
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Resource": [
+                                "*"
+                            ],
+                            "Action": [
+                                "s3:*"
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Resource": [
+                                "*"
+                            ],
+                            "Action": [
+                                "kms:GenerateDataKey*",
+                                "kms:Encrypt",
+                                "kms:Decrypt"
+                            ]
+                        },
+                        {
+                            "Effect": "Allow",
+                            "Resource": [
+                                "*"
+                            ],
+                            "Action": [
+                                "sns:SendMessage"
+                            ]
+                        }
+                    ]
+                },
+                "Roles": [{
+                    "Ref": "CodeBuildTrustRole"
+                }]
+            }
+        },
+        "CloudFormationTrustRole": {
+            "Description": "Creating service role in IAM for AWS CloudFormation",
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "${AppName}-cloudformation-role"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [
+                                "cloudformation.amazonaws.com"
+                            ]
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Path": "/"
+            }
+        },
+        "CloudFormationRolePolicy": {
+            "Type": "AWS::IAM::Policy",
+            "DependsOn": "CloudFormationTrustRole",
+            "Description": "Setting IAM policy for the service role for AWS CloudFormation",
+            "Properties": {
+                "PolicyName": "CloudFormationRolePolicy",
+                "PolicyDocument": {
+                    "Statement": [{
+                            "Action": [
+                                "s3:GetObject",
+                                "s3:GetObjectVersion",
+                                "s3:GetBucketVersioning"
+                            ],
+                            "Resource": "*",
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "s3:PutObject"
+                            ],
+                            "Resource": [
+                                "arn:aws:s3:::codepipeline*"
+                            ],
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "lambda:*"
+                            ],
+                            "Resource": {
+                                "Fn::Sub": "arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:*"
+                            },
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "lambda:ListTags",
+                                "lambda:TagResource",
+                                "lambda:UntagResource"
+                            ],
+                            "Resource": "*",
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "apigateway:*"
+                            ],
+                            "Resource": {
+                                "Fn::Sub": "arn:aws:apigateway:${AWS::Region}::*"
+                            },
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "iam:GetRole",
+                                "iam:CreateRole",
+                                "iam:DeleteRole"
+                            ],
+                            "Resource": {
+                                "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${AppName}-*"
+                            },
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "iam:AttachRolePolicy",
+                                "iam:DetachRolePolicy"
+                            ],
+                            "Resource": {
+                                "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${AppName}-*"
+                            },
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "iam:PassRole"
+                            ],
+                            "Resource": [
+                                "*"
+                            ],
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "cloudformation:CreateChangeSet"
+                            ],
+                            "Resource": {
+                                "Fn::Sub": "arn:aws:cloudformation:${AWS::Region}:aws:transform/Serverless-2016-10-31"
+                            },
+                            "Effect": "Allow"
+                        }
+                    ]
+                },
+                "Roles": [{
+                    "Ref": "CloudFormationTrustRole"
+                }]
+            }
+        },
+        "CodePipelineTrustRole": {
+            "Description": "Creating service role in IAM for AWS CodePipeline",
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "${AppName}-codepipeline-role"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [
+                                "codepipeline.amazonaws.com"
+                            ]
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Path": "/"
+            }
+        },
+        "CodePipelineRolePolicy": {
+            "Type": "AWS::IAM::Policy",
+            "DependsOn": "CodePipelineTrustRole",
+            "Description": "Setting IAM policy for the service role for AWS CodePipeline",
+            "Properties": {
+                "PolicyName": "CodePipelineRolePolicy",
+                "PolicyDocument": {
+                    "Statement": [{
+                            "Action": [
+                                "s3:GetObject",
+                                "s3:GetObjectVersion",
+                                "s3:GetBucketVersioning"
+                            ],
+                            "Resource": "*",
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "s3:PutObject"
+                            ],
+                            "Resource": [
+                                "arn:aws:s3:::codepipeline*"
+                            ],
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "codebuild:StartBuild",
+                                "codebuild:BatchGetBuilds"
+                            ],
+                            "Resource": "*",
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "cloudwatch:*",
+                                "s3:*",
+                                "sns:*",
+                                "cloudformation:*",
+                                "rds:*",
+                                "sqs:*",
+                                "iam:PassRole"
+                            ],
+                            "Resource": "*",
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
+                                "lambda:InvokeFunction",
+                                "lambda:ListFunctions"
+                            ],
+                            "Resource": "*",
+                            "Effect": "Allow"
+                        }
+                    ]
+                },
+                "Roles": [{
+                    "Ref": "CodePipelineTrustRole"
+                }]
+            }
+        },
+        "CodeBuildProject": {
+            "DependsOn": [
+                "S3ArtifactsBucket",
+                "CodeBuildTrustRole"
+            ],
+            "Description": "Creating AWS CodeBuild project",
+            "Type": "AWS::CodeBuild::Project",
+            "Properties": {
+                "Artifacts": {
+                    "Type": "CODEPIPELINE"
+                },
+                "Description": {
+                    "Fn::Sub": "Building stage for ${AppName}."
+                },
+                "Environment": {
+                    "ComputeType": "BUILD_GENERAL1_SMALL",
+                    "EnvironmentVariables": [{
+                            "Name": "S3_ARTIFACT_BUCKET",
+                            "Value": {
+                                "Ref": "S3ArtifactsBucket"
+                            }
+                        },
+                        {
+                            "Name": "S3_WEBSITE_BUCKET",
+                            "Value": {
+                                "Ref": "S3Bucket"
+                            }
+                        },
+                        {
+                            "Name": "INPUT_FILE",
+                            "Value": {
+                                "Ref": "SAMInputFile"
+                            }
+                        }
+                    ],
+                    "Image": {
+                        "Ref": "CodeBuildImage"
+                    },
+                    "Type": "LINUX_CONTAINER"
+                },
+                "Name": {
+                    "Fn::Sub": "${AppName}-build"
+                },
+                "ServiceRole": {
+                    "Fn::GetAtt": [
+                        "CodeBuildTrustRole",
+                        "Arn"
+                    ]
+                },
+                "Source": {
+                    "Type": "CODEPIPELINE"
+                },
+                "Tags": [{
+                    "Key": "app-name",
+                    "Value": {
+                        "Ref": "AppName"
+                    }
+                }],
+                "TimeoutInMinutes": 5
+            }
+        },
+        "S3ArtifactsBucket": {
+            "Description": "Creating Amazon S3 bucket for AWS CodePipeline artifacts",
+            "Type": "AWS::S3::Bucket",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+                "BucketName": {
+                    "Fn::Sub": "serverless-app-${AWS::AccountId}-${AWS::Region}-${AppName}"
+                },
+                "VersioningConfiguration": {
+                    "Status": "Enabled"
+                }
+            }
+        },
+        "S3ArtifactBucketPolicy": {
+            "DependsOn": [
+                "S3ArtifactsBucket"
+            ],
+            "Description": "Setting Amazon S3 bucket policy for AWS CodePipeline access",
+            "Type": "AWS::S3::BucketPolicy",
+            "Properties": {
+                "Bucket": {
+                    "Ref": "S3ArtifactsBucket"
+                },
+                "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Id": "SSEAndSSLPolicy",
+                    "Statement": [{
+                        "Sid": "DenyInsecureConnections",
+                        "Effect": "Deny",
+                        "Principal": "*",
+                        "Action": "s3:*",
+                        "Resource": {
+                            "Fn::Sub": "arn:aws:s3:::${S3ArtifactsBucket}/*"
+                        },
+                        "Condition": {
+                            "Bool": {
+                                "aws:SecureTransport": false
+                            }
+                        }
+                    }]
+                }
+            }
+        },
+        "ProjectPipeline": {
+            "DependsOn": [
+                "S3ArtifactsBucket",
+                "CodeBuildProject",
+                "CodePipelineTrustRole",
+                "CloudFormationTrustRole"
+            ],
+            "Description": "Creating a deployment pipeline for your project in AWS CodePipeline",
+            "Type": "AWS::CodePipeline::Pipeline",
+            "Properties": {
+                "Name": {
+                    "Fn::Sub": "${AppName}-pipeline"
+                },
+                "RoleArn": {
+                    "Fn::GetAtt": [
+                        "CodePipelineTrustRole",
+                        "Arn"
+                    ]
+                },
+                "Stages": [{
+                        "Name": "Source",
+                        "Actions": [{
+                            "Name": "source",
+                            "InputArtifacts": [],
+                            "ActionTypeId": {
+                                "Version": "1",
+                                "Category": "Source",
+                                "Owner": "ThirdParty",
+                                "Provider": "GitHub"
+                            },
+                            "OutputArtifacts": [{
+                                "Name": {
+                                    "Fn::Sub": "${AppName}-SourceArtifact"
+                                }
+                            }],
+                            "Configuration": {
+                                "Repo": {
+                                    "Ref": "GitHubRepoName"
+                                },
+                                "Branch": {
+                                    "Ref": "GitHubRepoBranch"
+                                },
+                                "OAuthToken": {
+                                    "Ref": "GitHubToken"
+                                },
+                                "Owner": {
+                                    "Ref": "GitHubUser"
+                                }
+                            },
+                            "RunOrder": 1
+                        }]
+                    },
+                    {
+                        "Name": "Build",
+                        "Actions": [{
+                            "Name": "build-from-source",
+                            "InputArtifacts": [{
+                                "Name": {
+                                    "Fn::Sub": "${AppName}-SourceArtifact"
+                                }
+                            }],
+                            "ActionTypeId": {
+                                "Category": "Build",
+                                "Owner": "AWS",
+                                "Version": "1",
+                                "Provider": "CodeBuild"
+                            },
+                            "OutputArtifacts": [{
+                                "Name": {
+                                    "Fn::Sub": "${AppName}-BuildArtifact"
+                                }
+                            }],
+                            "Configuration": {
+                                "ProjectName": {
+                                    "Fn::Sub": "${AppName}-build"
+                                }
+                            },
+                            "RunOrder": 1
+                        }]
+                    },
+                    {
+                        "Name": "Deploy",
+                        "Actions": [{
+                                "Name": "create-changeset",
+                                "InputArtifacts": [{
+                                    "Name": {
+                                        "Fn::Sub": "${AppName}-BuildArtifact"
+                                    }
+                                }],
+                                "ActionTypeId": {
+                                    "Category": "Deploy",
+                                    "Owner": "AWS",
+                                    "Version": "1",
+                                    "Provider": "CloudFormation"
+                                },
+                                "OutputArtifacts": [],
+                                "Configuration": {
+                                    "StackName": {
+                                        "Fn::Sub": "${AppName}-serverless-stack"
+                                    },
+                                    "ActionMode": "CHANGE_SET_REPLACE",
+                                    "RoleArn": {
+                                        "Fn::GetAtt": [
+                                            "CloudFormationTrustRole",
+                                            "Arn"
+                                        ]
+                                    },
+                                    "ChangeSetName": "pipeline-changeset",
+                                    "Capabilities": "CAPABILITY_NAMED_IAM",
+                                    "TemplatePath": {
+                                        "Fn::Sub": "${AppName}-BuildArtifact::${SAMOutputFile}"
+                                    }
+                                },
+                                "RunOrder": 1
+                            },
+                            {
+                                "Name": "execute-changeset",
+                                "InputArtifacts": [],
+                                "ActionTypeId": {
+                                    "Category": "Deploy",
+                                    "Owner": "AWS",
+                                    "Version": "1",
+                                    "Provider": "CloudFormation"
+                                },
+                                "OutputArtifacts": [],
+                                "Configuration": {
+                                    "StackName": {
+                                        "Fn::Sub": "${AppName}-serverless-stack"
+                                    },
+                                    "ActionMode": "CHANGE_SET_EXECUTE",
+                                    "ChangeSetName": "pipeline-changeset"
+                                },
+                                "RunOrder": 2
+                            }
+                        ]
+                    }
+                ],
+                "ArtifactStore": {
+                    "Type": "S3",
+                    "Location": {
+                        "Ref": "S3ArtifactsBucket"
+                    }
+                }
+            }
+        },
+        "UserPool": {
+            "Type": "AWS::Cognito::UserPool",
+            "Properties": {
+                "UserPoolName": {
+                    "Ref": "CognitoPool"
+                },
+                "AutoVerifiedAttributes": [
+                    "email"
+                ],
+                "EmailVerificationMessage": "Your verification code is {####}.",
+                "EmailVerificationSubject": "Your verification code"
+            }
+        },
+        "UserPoolClient": {
+            "Type": "AWS::Cognito::UserPoolClient",
+            "Properties": {
+                "ClientName": "WebApp",
+                "GenerateSecret": "false",
+                "UserPoolId": {
+                    "Ref": "UserPool"
+                }
+            }
+        },
+        "CognitoConfigRole": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "Path": "/cognito/",
+                "AssumeRolePolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "lambda.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Policies": [{
+                    "PolicyName": "CognitoConfig",
+                    "PolicyDocument": {
+                        "Version": "2012-10-17",
+                        "Statement": [{
+                                "Sid": "Logging",
+                                "Effect": "Allow",
+                                "Action": [
+                                    "logs:CreateLogGroup",
+                                    "logs:CreateLogStream",
+                                    "logs:PutLogEvents"
+                                ],
+                                "Resource": "*"
+                            },
+                            {
+                                "Sid": "Cognito",
+                                "Effect": "Allow",
+                                "Action": [
+                                    "cognito-idp:CreateUserPool",
+                                    "cognito-idp:DeleteUserPool",
+                                    "cognito-idp:CreateUserPoolClient",
+                                    "cognito-idp:DeleteUserPoolClient"
+                                ],
+                                "Resource": "*"
+                            },
+                            {
+                                "Sid": "ConfigBucketWriteAccess",
+                                "Effect": "Allow",
+                                "Action": [
+                                    "s3:PutObject",
+                                    "s3:PutObjectAcl",
+                                    "s3:PutObjectVersionAcl"
+                                ],
+                                "Resource": [{
+                                    "Fn::Sub": "arn:aws:s3:::${BucketName}/*"
+                                }]
+                            }
+                        ]
+                    }
+                }]
+            }
+        }
+    },
+    "Outputs": {
+        "BucketName": {
+            "Value": {
+                "Ref": "S3Bucket"
+            },
+            "Description": "The created bucket name"
+        },
+        "OriginURL": {
+            "Value": {
+                "Fn::GetAtt": [
+                    "S3Bucket",
+                    "WebsiteURL"
+                ]
+            },
+            "Description": "URL for the website hosted on S3"
+        },
+        "UserPoolId": {
+            "Value": {
+                "Ref": "UserPool"
+            },
+            "Description": "User Pool ID"
+        },
+        "UserPoolClientId": {
+            "Value": {
+                "Ref": "UserPoolClient"
+            },
+            "Description": "User Pool Client ID"
+        }
+    }
+}

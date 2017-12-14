@@ -1,0 +1,22 @@
+version: 0.0
+environment_variables:
+    plaintext:
+        "INPUT_FILE": ""
+        "S3_WEBSITE_BUCKET": ""
+        "S3_ARTIFACT_BUCKET": ""
+containers:
+    LambdaFunctions:
+        phases:
+            during_build:
+                commands:
+                    - for i in ./lambda/*; do [ -d $i ] && cd "$i" && npm install && cd ../..; done
+                    - apt update
+                    - apt install jekyll -y
+                    - apt install python-pip python-dev build-essential -y
+                    - pip install awscli
+                    - aws cloudformation package --template $INPUT_FILE --s3-bucket $S3_ARTIFACT_BUCKET --output-template post-package.yaml
+                    - jekyll build --source website/ --destination website/_site/
+                    - aws s3 sync website/_site/ "s3://${S3_WEBSITE_BUCKET}"
+        artifacts:
+            files:
+                - post-package.yaml

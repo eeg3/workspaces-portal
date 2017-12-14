@@ -1,0 +1,68 @@
+---
+title: Introduction
+layout: default
+---
+
+<!-- Main jumbotron -->
+<div class="jumbotron">
+  <h1>{{page.title}}</h1>
+  <p>
+    This is a template for a serverless site using AWS
+    <a href="https://aws.amazon.com/s3/">S3</a>,
+    <a href="https://aws.amazon.com/lambda/">Lambda</a>,
+    <a href="https://aws.amazon.com/cognito/">Cognito</a>,
+    <a href="https://aws.amazon.com/iam/">IAM</a>, and
+    <a href="https://aws.amazon.com/api-gateway/">API Gateway</a>.
+  </p>
+  <p>
+    The template is also powered by a CI/CD Pipeline through AWS 
+    <a href="https://aws.amazon.com/codepipeline/">CodePipeline</a>, 
+    <a href="https://aws.amazon.com/codebuild/">CodeBuild</a>, and 
+    <a href="https://aws.amazon.com/cloudformation/">CloudFormation & SAM</a>, as well as
+    <a href="http://www.github.com">GitHub</a>.
+  </p>
+  <p>
+    The site itself leverages <a href="https://getbootstrap.com/">Bootstrap</a> and
+    <a href="http://fontawesome.io/">FontAwesome</a>, and is generated through  
+    <a href="https://jekyllrb.com/">Jekyll</a>.
+  </p>
+  <p>
+    The documentation (i.e. setup instructions, modification details) and full source code for this template as well as the pipeline
+    that powers it is available within the GitHub repository.
+  </p>
+  <a href="https://github.com/eeg3/serverless-template" class="btn btn-primary">View Source Code</a>
+</div>
+<div class="row">
+  <div class="col-sm-4">
+    <h2>Register</h2>
+    <p>Sign up for an account that registers to the site's Cognito user pool. An automatic email verification will be sent.</p>
+    <p>
+      <a class="btn btn-default" href="/register.html" role="button">Register »</a>
+    </p>
+  </div>
+  <div class="col-sm-4">
+    <h2>Verify</h2>
+    <p>Use the code emailed to you to verify your email. This is required prior to authenticating with the system.</p>
+    <p>
+      <a class="btn btn-default" href="/verify.html" role="button">Verify »</a>
+    </p>
+  </div>
+  <div class="col-sm-4">
+    <h2>Authenticate</h2>
+    <p>Use login credentials to sign in to the site. This authenticates you with the sites and the API Gateway (if enabled).</p>
+    <p>
+      <a class="btn btn-default" href="/signin.html" role="button">Sign-in »</a>
+    </p>
+  </div>
+</div>
+
+
+
+<script src="js/vendor/jquery-3.1.0.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+<script src="js/vendor/aws-cognito-sdk.min.js"></script>
+<script src="js/vendor/amazon-cognito-identity.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/cognito-auth.js"></script>
+<script src="js/index.js"></script>

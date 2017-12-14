@@ -1,0 +1,11 @@
+{
+  "name": "sam",
+  "version": "1.0.0",
+  "description": "Send squirrel count.",
+  "main": "sam.js",
+  "scripts": {
+    "test": "lambda-local -l sam.js -e sample_events/se-sam.js"
+  },
+  "author": "Earl Gay",
+  "license": "BSD-2-Clause"
+}

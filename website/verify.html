@@ -1,0 +1,63 @@
+---
+title: Verify
+layout: default
+---
+
+<!-- Main jumbotron -->
+<div class="jumbotron">
+  <h1>{{page.title}}</h1>
+
+  <p>
+    Authentication for this site uses AWS
+    <a href="https://aws.amazon.com/cognito/">Cognito</a> in order to provide access through the
+    <a href="https://aws.amazon.com/api-gateway/">API Gateway</a> powering the
+    <a href="https://aws.amazon.com/lambda/">Lambda</a> functions with the site's dynamic content.
+  </p>
+  <p>
+    The documentation (i.e. setup instructions, modification details) and full source code for this site as well as the pipeline
+    that powers it is available within the GitHub repository.
+  </p>
+  <a href="https://github.com/eeg3/serverless-pipeline" class="btn btn-primary">View Source Code</a>
+  </p>
+</div>
+
+<div class="page-header">
+  <h1>Verification</h1>
+</div>
+<div class="row">
+  <div class="col-sm-4 col-sm-offset-4">
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Verify Code</h3>
+      </div>
+      <div class="panel-body">
+        <form id="verifyForm">
+          <input type="email" id="emailInputVerify" placeholder="Email" required>
+          <br />
+          <input type="text" id="codeInputVerify" placeholder="Verification Code" pattern=".*" required>
+          <br />
+          <br />
+          <input type="submit" value="Verify">
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- /.col-sm-4 -->
+
+</div>
+
+
+<!-- Bootstrap core JavaScript
+    ================================================== -->
+<!-- Placed at the end of the document so the pages load faster -->
+<script src="/js/vendor/jquery-3.1.0.js"></script>
+<script src="/js/vendor/bootstrap.min.js"></script>
+<script src="/js/vendor/docs.min.js"></script>
+<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+<script src="/js/vendor/ie10-viewport-bug-workaround.js"></script>
+
+<script src="js/vendor/aws-cognito-sdk.min.js"></script>
+<script src="js/vendor/amazon-cognito-identity.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/cognito-auth.js"></script>

@@ -1,0 +1,53 @@
+---
+title: Squirrel Farm
+layout: default
+---
+
+<!-- Main jumbotron -->
+<div class="jumbotron">
+  <h1>{{page.title}}</h1>
+
+  <p>
+    This squirrel farm code leverages the sample SAM project by AWS Labs:
+    <a href="https://github.com/awslabs/aws-serverless-samfarm">Serverless SAM Farm</a>.
+  </p>
+  <p>
+    The documentation (i.e. setup instructions, modification details) and full source code for this site as well as the pipeline
+    that powers it is available within the GitHub repository.
+  </p>
+  <a href="https://github.com/eeg3/serverless-pipeline" class="btn btn-primary">View Source Code</a>
+</div>
+
+<div class="page-header">
+  <h1>Squirrel Farm</h1>
+</div>
+<div class="row">
+  <div id="samfarm" class="col-sm-12">
+  </div>
+</div>
+
+
+<div id="noApiMessage" class="configMessage" style="display: none;">
+  <div class="backdrop"></div>
+  <div class="panel panel-default">
+    <div class="panel-heading">
+      <h3 class="panel-title">Successfully Authenticated!</h3>
+    </div>
+    <div class="panel-body">
+      <p>This page is not functional yet because there is no API invoke URL configured in
+        <a href="/js/config.js">/js/config.js</a>.</p>
+      <p>In the meantime, in order to test the Amazon Cognito user pool authorizer for your API, use the auth token below:</p>
+      <textarea class="authToken"></textarea>
+    </div>
+  </div>
+</div>
+
+
+<script src="js/vendor/jquery-3.1.0.js"></script>
+<script src="js/vendor/bootstrap.min.js"></script>
+<script src="js/vendor/aws-cognito-sdk.min.js"></script>
+<script src="js/vendor/amazon-cognito-identity.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+<script src="js/config.js"></script>
+<script src="js/cognito-auth.js"></script>
+<script src="js/farm.js"></script>
