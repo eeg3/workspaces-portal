@@ -24,17 +24,16 @@ layout: default
         <h3 class="panel-title">Request WorkSpace</h3>
       </div>
       <div class="panel-body">
-        <form id="RequestWorkSpace" method="post" action="https://ij9s3auwzj.execute-api.us-east-1.amazonaws.com/Prod/workspaces-control">
-          <input type="hidden" id="action" value="create">
+        <form id="RequestWorkSpace">
           <div>
-            <input id="username" placeholder="User Name" name="username" type="text" maxlength="20" value="" required />
+            <input id="reqUsername" placeholder="User Name" name="username" type="text" maxlength="20" value="" required />
           </div>
           <div>
-            <input id="email" placeholder="Your Email" name="email" type="text" maxlength="255" value="" required/>
+            <input id="reqEmail" placeholder="Your Email" name="email" type="text" maxlength="255" value="" required/>
           </div>
           <br>
           <div>
-            <input id="bundle" placeholder="Bundle ID" name="bundle" type="text" maxlength="255" value="" required/>              
+            <input id="reqBundle" placeholder="Bundle ID" name="bundle" type="text" maxlength="255" value="" required/>              
             <!--
             <label>Select Bundle</label>
             <select id="bundle" name="bundle" />
@@ -67,7 +66,7 @@ layout: default
           </div>
           <br>
           <div>
-            <button id="submit" type="submit" name="submit">
+            <button type="submit" name="submit">
               <span>Submit</span>
               <i></i>
             </button>
