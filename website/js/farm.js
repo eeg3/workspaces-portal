@@ -108,21 +108,8 @@ var authToken;
     // SAMs should be on the screen.
     setInterval(() => {
         $.ajax({
-            method: 'POST',
+            method: 'GET',
             url: GET_SAM_COUNT_URL,
-            // Placeholder for Lambda authentication when CORS is better supported through SAM.
-            // See: https://github.com/awslabs/serverless-application-model/issues/23
-            // Currently, page is redirected back to sign-ni page based on presence of auth token.
-            headers: {
-                Authorization: authToken
-            },
-            data: JSON.stringify({
-                PickupLocation: {
-                    Latitude: "101",
-                    Longitude: "202"
-                }
-            }),
-            contentType: 'application/json',
             success: function (data) {
                 DESIRED_SAM_COUNT = data;
             }

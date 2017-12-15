@@ -24,7 +24,8 @@ layout: default
         <h3 class="panel-title">Request WorkSpace</h3>
       </div>
       <div class="panel-body">
-        <form id="RequestWorkSpace" method="post" action="https://abcabcabc.execute-api.us-east-1.amazonaws.com/prod/request">
+        <form id="RequestWorkSpace" method="post" action="https://ij9s3auwzj.execute-api.us-east-1.amazonaws.com/Prod/workspaces-control">
+          <input type="hidden" id="action" value="create">
           <div>
             <input id="username" placeholder="User Name" name="username" type="text" maxlength="20" value="" required />
           </div>
@@ -33,6 +34,8 @@ layout: default
           </div>
           <br>
           <div>
+            <input id="bundle" placeholder="Bundle ID" name="bundle" type="text" maxlength="255" value="" required/>              
+            <!--
             <label>Select Bundle</label>
             <select id="bundle" name="bundle" />
             <option value="wsb-b0s22j3d7"> Performance with Windows 7</option>
@@ -60,6 +63,7 @@ layout: default
             <option value="wsb-5h1pf1zxc"> Standard with Windows 7 and Office 2013</option>
             <option value="wsb-vlsvncjjf"> Standard with Windows 7 and Office 2010</option>
             </select>
+            -->
           </div>
           <br>
           <div>

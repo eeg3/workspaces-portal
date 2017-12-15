@@ -1,0 +1,14 @@
+{
+  "name": "workspaces-control",
+  "version": "1.0.0",
+  "description": "Manage AWS WorkSpaces.",
+  "main": "workspaces-control.js",
+  "scripts": {
+    "test": "lambda-local -l workspaces-control.js -e sample_events/se-wc-create.js"
+  },
+  "author": "Earl Gay",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "aws-sdk": "^2.170.0"
+  }
+}
