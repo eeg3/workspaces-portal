@@ -20,6 +20,8 @@ The initial CloudFormation Stack should be created after `deploy.json` is launch
 
 After initial deployment, the site will not be fully functional as the `config.js` file still needs to be updated so the site knows how to utilize the services. Within the parent Stack, the Outputs tab should display the following items:
 
+Also needed after deployment is to configure Cognito -> User Pools -> <Created Pool> -> General Settings -> Triggers -> Custom Message Trigger to point to the cogDomainVerify Lambda function. This will enable limiting signups to the email domain configured in the function.
+
 1. **UserPoolClientId**
 2. **BucketName**
 3. **UserPoolId**

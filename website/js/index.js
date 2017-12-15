@@ -4,11 +4,10 @@ var Dashboard = window.Dashboard || {};
 var authToken;
 
 (function ($) {
-    /*
+    
     Dashboard.authToken.then(function setAuthToken(token) {
         if (token) {
             authToken = token;
-            window.location.href = '/home.html';
         } else {
             window.location.href = '/signin.html';
         }
@@ -16,7 +15,7 @@ var authToken;
         alert(error);
         window.location.href = '/signin.html';
     });
-    */
+    
 
     $(function init() {
         if (!_config.api.invokeUrl) {

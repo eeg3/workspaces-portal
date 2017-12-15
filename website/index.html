@@ -1,5 +1,5 @@
 ---
-title: Introduction
+title: WorkSpaces Self-Service
 layout: default
 ---
 
@@ -7,52 +7,129 @@ layout: default
 <div class="jumbotron">
   <h1>{{page.title}}</h1>
   <p>
-    This is a template for a serverless site using AWS
-    <a href="https://aws.amazon.com/s3/">S3</a>,
-    <a href="https://aws.amazon.com/lambda/">Lambda</a>,
-    <a href="https://aws.amazon.com/cognito/">Cognito</a>,
-    <a href="https://aws.amazon.com/iam/">IAM</a>, and
-    <a href="https://aws.amazon.com/api-gateway/">API Gateway</a>.
-  </p>
-  <p>
-    The template is also powered by a CI/CD Pipeline through AWS 
-    <a href="https://aws.amazon.com/codepipeline/">CodePipeline</a>, 
-    <a href="https://aws.amazon.com/codebuild/">CodeBuild</a>, and 
-    <a href="https://aws.amazon.com/cloudformation/">CloudFormation & SAM</a>, as well as
-    <a href="http://www.github.com">GitHub</a>.
-  </p>
-  <p>
-    The site itself leverages <a href="https://getbootstrap.com/">Bootstrap</a> and
-    <a href="http://fontawesome.io/">FontAwesome</a>, and is generated through  
-    <a href="https://jekyllrb.com/">Jekyll</a>.
+    Request, Reboot, Rebuild, and Decommission your Amazon WorkSpace.
   </p>
   <p>
     The documentation (i.e. setup instructions, modification details) and full source code for this template as well as the pipeline
     that powers it is available within the GitHub repository.
   </p>
-  <a href="https://github.com/eeg3/serverless-template" class="btn btn-primary">View Source Code</a>
+  <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-primary">View Source Code</a>
+</div>
+
+<div class="row">
+  <div class="col-sm-6">
+
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Request WorkSpace</h3>
+      </div>
+      <div class="panel-body">
+        <form id="RequestWorkSpace" method="post" action="https://abcabcabc.execute-api.us-east-1.amazonaws.com/prod/request">
+          <div>
+            <input id="username" placeholder="User Name" name="username" type="text" maxlength="20" value="" required />
+          </div>
+          <div>
+            <input id="email" placeholder="Your Email" name="email" type="text" maxlength="255" value="" required/>
+          </div>
+          <br>
+          <div>
+            <label>Select Bundle</label>
+            <select id="bundle" name="bundle" />
+            <option value="wsb-b0s22j3d7"> Performance with Windows 7</option>
+            <option value="wsb-1b5w6vnz6"> Performance with Windows 7 and Office 2010</option>
+            <option value="wsb-vbsjd64y6"> Performance with Windows 7 and Office 2013</option>
+            <option value="wsb-gm4d5tx2v"> Performance with Windows 10</option>
+            <option value="wsb-6cdbk8901"> Performance with Windows 10 and Office 2016</option>
+            <option value="wsb-92tn3b7gx"> Value with Windows 7</option>
+            <option value="wsb-kgjp98lt8"> Value with Windows 7 and Office 2010</option>
+            <option value="wsb-fgy4lgypc"> Value with Windows 7 and Office 2013</option>
+            <option value="wsb-bh8rsxt14"> Value with Windows 10</option>
+            <option value="wsb-df76rqys9"> Value with Windows 10 and Office 2016</option>
+            <option value="wsb-wwx8kkwg5"> Graphics with Windows 7 and Office 2010</option>
+            <option value="wsb-44r73z5dr"> Graphics with Windows 7 and Office 2013</option>
+            <option value="wsb-dy4bd5kvl"> Graphics with Windows 7</option>
+            <option value="wsb-320p8vd2j"> Graphics with Windows 10</option>
+            <option value="wsb-ftkjdlgks"> Graphics with Windows 10 and Office 2016</option>
+            <option value="wsb-hztzqyk3m"> Power with Windows 10 and Office 2016</option>
+            <option value="wsb-cq3wxw02g"> Power with Windows 7</option>
+            <option value="wsb-2gcd1nm07"> Power with Windows 7 and Office 2013</option>
+            <option value="wsb-w42vs8svd"> Power with Windows 10</option>
+            <option value="wsb-3t36q0xfc"> Standard with Windows 7</option>
+            <option value="wsb-8vbljg4r6"> Standard with Windows 10</option>
+            <option value="wsb-9jvhtb24f" selected> Standard with Windows 10 and Office 2016</option>
+            <option value="wsb-5h1pf1zxc"> Standard with Windows 7 and Office 2013</option>
+            <option value="wsb-vlsvncjjf"> Standard with Windows 7 and Office 2010</option>
+            </select>
+          </div>
+          <br>
+          <div>
+            <button id="submit" type="submit" name="submit">
+              <span>Submit</span>
+              <i></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div class="col-sm-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Reboot WorkSpace</h3>
+      </div>
+      <div class="panel-body">
+        <form id="RebootRequest" method="post" action="#">
+          <div>
+            <input id="username" placeholder="User Name" name="username" type="text" maxlength="20" value="" required/>
+          </div>
+          <br>
+          <button id="submit" type="submit" name="submit">
+            <span>Submit</span>
+            <i></i>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
 </div>
 <div class="row">
-  <div class="col-sm-4">
-    <h2>Register</h2>
-    <p>Sign up for an account that registers to the site's Cognito user pool. An automatic email verification will be sent.</p>
-    <p>
-      <a class="btn btn-default" href="/register.html" role="button">Register »</a>
-    </p>
+  <div class="col-sm-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Rebuild WorkSpace</h3>
+      </div>
+      <div class="panel-body">
+        <form id="RebuildRequest" method="post" action="#">
+          <div>
+            <input id="username" placeholder="User Name" name="username" type="text" maxlength="20" value="" required/>
+          </div>
+          <br>
+          <button id="submit" type="submit" name="submit">
+            <span>Submit</span>
+            <i></i>
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
-  <div class="col-sm-4">
-    <h2>Verify</h2>
-    <p>Use the code emailed to you to verify your email. This is required prior to authenticating with the system.</p>
-    <p>
-      <a class="btn btn-default" href="/verify.html" role="button">Verify »</a>
-    </p>
-  </div>
-  <div class="col-sm-4">
-    <h2>Authenticate</h2>
-    <p>Use login credentials to sign in to the site. This authenticates you with the sites and the API Gateway (if enabled).</p>
-    <p>
-      <a class="btn btn-default" href="/signin.html" role="button">Sign-in »</a>
-    </p>
+  <div class="col-sm-6">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">Decommission WorkSpace</h3>
+      </div>
+      <div class="panel-body">
+        <form id="Decommission" method="post" action="#">
+          <div>
+            <input id="username" placeholder="User Name" name="username" type="text" maxlength="20" value="" required/>
+          </div>
+          <br>
+          <button id="submit" type="submit" name="submit">
+            <span>Submit</span>
+            <i></i>
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
