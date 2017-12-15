@@ -47,6 +47,7 @@
                 "Handler": "workspaces-control.handler",
                 "Runtime": "nodejs4.3",
                 "CodeUri": "./lambda/workspaces-control/",
+                "Policies": "AmazonWorkSpacesAdmin",
                 "Environment": {
                     "Variables": {
                         "ORIGIN_URL": {
