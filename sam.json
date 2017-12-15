@@ -41,7 +41,7 @@
                 }
             }
         },
-        "workspaces-control": {
+        "workspacescontrol": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "sam.handler",
