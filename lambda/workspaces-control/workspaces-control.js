@@ -34,12 +34,7 @@ exports.handler = (event, context, callback) => {
     console.log("action: " + action);
 
     if (action == "list") {
-        // aws workspaces describe-workspaces -> returns obj of all
-        // for each workspace in describe obj -> aws workspaces describe-tags --resource-id obj[i] -> returns obj TagList with key/val pairs
-        // for each key/value pair in TagList -> if Key = SelfServiceManaged check if Value = requestContext.authorizer.email
-        // if true -> print it out
-        //var requestContext = JSON.parse(event.requestContext);
-        console.log(event.requestContext.authorizer.claims.email);
+        console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
 
         var params = [];
 
@@ -47,35 +42,45 @@ exports.handler = (event, context, callback) => {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
-                console.log(data);
-                console.log(data.Workspaces[0].WorkspaceId);
+                //console.log(data);
+                //console.log(data.Workspaces[0].WorkspaceId);
 
-                var params = {
-                    ResourceId: data.Workspaces[0].WorkspaceId /* required */
-                };
-                workspaces.describeTags(params, function (err, data) {
-                    if (err) {
-                        console.log(err, err.stack);
-                    } else {
-                        console.log(data);
-                        console.log("Key: " + data.TagList[0].Key);
-                        console.log("Value: " + data.TagList[0].Value);
-                        callback(null, {
-                            "statusCode": 200,
-                            "body": JSON.stringify({
-                                Result: data.TagList[0].Value
-                            }),
-                            "headers": {
-                                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                                "Access-Control-Allow-Methods": "GET,OPTIONS",
-                                "Access-Control-Allow-Origin": originURL
+                for (var i = 0; i < data.Workspaces.length; i++) {
+                    //console.log("Desktop[" + i + "]: " + data.Workspaces[i].WorkspaceId + " is owned by: " + data.Workspaces[i].UserName);
+
+                    var params = {
+                        ResourceId: data.Workspaces[i].WorkspaceId /* required */
+                    };
+                    workspaces.describeTags(params, function (err, data) {
+                        if (err) {
+                            console.log(err, err.stack);
+                        } else {
+                            //console.log(data);
+
+                            for (var i = 0; i < data.TagList.length; i++) {
+
+                                if (data.TagList[i].Key == "SelfServiceManaged" && data.TagList[i].Value == event.requestContext.authorizer.claims.email) {
+                                    console.log("Desktop for '" + event.requestContext.authorizer.claims.email + "' found: " + params.ResourceId);
+                                    callback(null, {
+                                        "statusCode": 200,
+                                        "body": JSON.stringify({
+                                            Result: params.ResourceId
+                                        }),
+                                        "headers": {
+                                            "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                                            "Access-Control-Allow-Methods": "GET,OPTIONS",
+                                            "Access-Control-Allow-Origin": originURL
+                                        }
+                                    });
+                                }
                             }
-                        });
-                    }
-                });
+
+                        }
+                    });
+                }
+
             }
         });
-
 
     } else if (action == "create") {
         //var opp = JSON.parse(event.body)["opp"];
@@ -128,42 +133,79 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "delete") {
-        var workspace = JSON.parse(event.body)["workspaceid"];
+        console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
 
-        var params = {
-            TerminateWorkspaceRequests: [{
-                WorkspaceId: workspace
-            }]
-        };
+        var describeWorkspacesParams = [];
 
-        console.log(JSON.stringify(params));
-
-        workspaces.terminateWorkspaces(params, function (err, data) {
+        workspaces.describeWorkspaces(describeWorkspacesParams, function (err, data) {
             if (err) {
-                console.log("Error: " + err);
-                callback(null, {
-                    statusCode: 500,
-                    body: JSON.stringify({
-                        Error: err,
-                    }),
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                });
+                console.log(err, err.stack); // an error occurred
             } else {
-                // TODO: Check if "FailedRequests" is empty.
-                console.log("Result: " + JSON.stringify(data));
-                callback(null, {
-                    "statusCode": 200,
-                    "body": JSON.stringify({
-                        Result: data
-                    }),
-                    "headers": {
-                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                        "Access-Control-Allow-Methods": "GET,OPTIONS",
-                        "Access-Control-Allow-Origin": originURL
-                    }
-                });
+                //console.log(data);
+                //console.log(data.Workspaces[0].WorkspaceId);
+
+                for (var i = 0; i < data.Workspaces.length; i++) {
+                    //console.log("Desktop[" + i + "]: " + data.Workspaces[i].WorkspaceId + " is owned by: " + data.Workspaces[i].UserName);
+
+                    var describeTagsParams = {
+                        ResourceId: data.Workspaces[i].WorkspaceId /* required */
+                    };
+                    workspaces.describeTags(describeTagsParams, function (err, data) {
+                        if (err) {
+                            console.log(err, err.stack);
+                        } else {
+                            //console.log(data);
+
+                            for (var i = 0; i < data.TagList.length; i++) {
+                                if (data.TagList[i].Key == "SelfServiceManaged" && data.TagList[i].Value == event.requestContext.authorizer.claims.email) {
+                                    console.log("Desktop for '" + event.requestContext.authorizer.claims.email + "' found: " + describeTagsParams.ResourceId);
+                                    console.log("Deleting desktop '" + describeTagsParams.ResourceId + " per request.");
+
+                                    var deletionParams = {
+                                        TerminateWorkspaceRequests: [{
+                                            WorkspaceId: describeTagsParams.ResourceId
+                                        }]
+                                    };
+
+                                    console.log(JSON.stringify(deletionParams));
+
+                                    workspaces.terminateWorkspaces(deletionParams, function (err, data) {
+                                        if (err) {
+                                            console.log("Error: " + err);
+                                            callback(null, {
+                                                statusCode: 500,
+                                                body: JSON.stringify({
+                                                    Error: err,
+                                                }),
+                                                headers: {
+                                                    'Access-Control-Allow-Origin': '*',
+                                                },
+                                            });
+                                        } else {
+                                            // TODO: Check if "FailedRequests" is empty.
+                                            console.log("Result: " + JSON.stringify(data));
+                                            
+                                            callback(null, {
+                                                "statusCode": 200,
+                                                "body": JSON.stringify({
+                                                    Result: data
+                                                }),
+                                                "headers": {
+                                                    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                                                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                                                    "Access-Control-Allow-Origin": originURL
+                                                }
+                                            });
+                                        }
+                                    });
+
+                                }
+                            }
+
+                        }
+                    });
+                }
+
             }
         });
 
