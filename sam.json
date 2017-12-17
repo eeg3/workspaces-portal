@@ -29,15 +29,6 @@
                             "Ref": "OriginUrl"
                         }
                     }
-                },
-                "Events": {
-                    "GetResource": {
-                        "Type": "Api",
-                        "Properties": {
-                            "Path": "/squirrel",
-                            "Method": "get"
-                        }
-                    }
                 }
             }
         },
@@ -52,15 +43,6 @@
                     "Variables": {
                         "ORIGIN_URL": {
                             "Ref": "OriginUrl"
-                        }
-                    }
-                },
-                "Events": {
-                    "GetResource": {
-                        "Type": "Api",
-                        "Properties": {
-                            "Path": "/workspaces-control",
-                            "Method": "post"
                         }
                     }
                 }

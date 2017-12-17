@@ -26,6 +26,8 @@ var authToken;
 
     function handleRequest(event) {
         event.preventDefault();
+        var username = $('#reqUsername').val();
+        var bundle = $('#reqBundle').val();
 
         $.ajax({
             method: 'POST',
@@ -35,14 +37,21 @@ var authToken;
             },
             beforeSend: function () {
                 //$('#loading-image').show();
+                console.log("URL: " + WORKSPACES_CONTROL_URL);
+                console.log("Token: " + authToken);
+                console.log("json: " + JSON.stringify({
+                    action: 'create',
+                    username: username,
+                    bundle: bundle
+                }));
             },
             complete: function () {
                 //$('#loading-image').hide();
             },
             data: JSON.stringify({
                 action: 'create',
-                username: $('#reqUsername').val(),
-                bundle: $('#reqBundle').val()
+                username: username,
+                bundle: bundle
             }),
             contentType: 'text/plain',
             success: function (data) {

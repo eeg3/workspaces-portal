@@ -12,6 +12,10 @@ layout: default
   <p>
     The documentation (i.e. setup instructions, modification details) and full source code for this template as well as the pipeline
     that powers it is available within the GitHub repository.
+    <button id="reqButton2">
+        <span>Request</span>
+        <i></i>
+      </button>
   </p>
   <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-primary">View Source Code</a>
 </div>
@@ -28,10 +32,6 @@ layout: default
           <div>
             <input id="reqUsername" placeholder="User Name" name="username" type="text" maxlength="20" value="" required />
           </div>
-          <div>
-            <input id="reqEmail" placeholder="Your Email" name="email" type="text" maxlength="255" value="" required/>
-          </div>
-          <br>
           <div>
             <input id="reqBundle" placeholder="Bundle ID" name="bundle" type="text" maxlength="255" value="" required/>              
             <!--
@@ -66,7 +66,7 @@ layout: default
           </div>
           <br>
           <div>
-            <button type="submit" name="submit">
+            <button id="reqButton" type="submit" name="submit">
               <span>Submit</span>
               <i></i>
             </button>
