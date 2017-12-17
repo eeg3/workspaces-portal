@@ -31,8 +31,53 @@ exports.handler = (event, context, callback) => {
     //}
 
     var action = JSON.parse(event.body)["action"];
+    console.log("action: " + action);
 
-    if (action == "create") {
+    if (action == "list") {
+        // aws workspaces describe-workspaces -> returns obj of all
+        // for each workspace in describe obj -> aws workspaces describe-tags --resource-id obj[i] -> returns obj TagList with key/val pairs
+        // for each key/value pair in TagList -> if Key = SelfServiceManaged check if Value = requestContext.authorizer.email
+        // if true -> print it out
+        //var requestContext = JSON.parse(event.requestContext);
+        console.log(event.requestContext.authorizer.claims.email);
+
+        var params = [];
+
+        workspaces.describeWorkspaces(params, function (err, data) {
+            if (err) {
+                console.log(err, err.stack); // an error occurred
+            } else {
+                console.log(data);
+                console.log(data.Workspaces[0].WorkspaceId);
+
+                var params = {
+                    ResourceId: data.Workspaces[0].WorkspaceId /* required */
+                };
+                workspaces.describeTags(params, function (err, data) {
+                    if (err) {
+                        console.log(err, err.stack);
+                    } else {
+                        console.log(data);
+                        console.log("Key: " + data.TagList[0].Key);
+                        console.log("Value: " + data.TagList[0].Value);
+                        callback(null, {
+                            "statusCode": 200,
+                            "body": JSON.stringify({
+                                Result: data.TagList[0].Value
+                            }),
+                            "headers": {
+                                "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                                "Access-Control-Allow-Methods": "GET,OPTIONS",
+                                "Access-Control-Allow-Origin": originURL
+                            }
+                        });
+                    }
+                });
+            }
+        });
+
+
+    } else if (action == "create") {
         //var opp = JSON.parse(event.body)["opp"];
         var username = JSON.parse(event.body)["username"];
         var bundle = JSON.parse(event.body)["bundle"];
@@ -43,8 +88,8 @@ exports.handler = (event, context, callback) => {
                 DirectoryId: config.Directory,
                 UserName: username,
                 Tags: [{
-                    Key: 'Owner',
-                    Value: 'Earl'
+                    Key: 'SelfServiceManaged',
+                    Value: event.requestContext.authorizer.claims.email
                 }, ],
                 WorkspaceProperties: {
                     RunningMode: config.Mode,

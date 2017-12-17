@@ -19,7 +19,11 @@ layout: default
   </p>
   <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-primary">View Source Code</a>
 </div>
-
+<div class="row">
+  <div class="col-sm-12">
+      <div id="methodStatus" class="alert" role="alert"></div>
+  </div>
+</div>
 <div class="row">
   <div class="col-sm-6">
 
@@ -30,10 +34,10 @@ layout: default
       <div class="panel-body">
         <form id="RequestWorkSpace">
           <div>
-            <input id="reqUsername" placeholder="User Name" name="username" type="text" maxlength="20" value="" required />
+            <input id="reqUsername" placeholder="User Name" type="text" maxlength="20" value="" required />
           </div>
           <div>
-            <input id="reqBundle" placeholder="Bundle ID" name="bundle" type="text" maxlength="255" value="" required/>              
+            <input id="reqBundle" placeholder="Bundle ID" type="text" maxlength="255" value="" required/>              
             <!--
             <label>Select Bundle</label>
             <select id="bundle" name="bundle" />
@@ -121,9 +125,9 @@ layout: default
         <h3 class="panel-title">Decommission WorkSpace</h3>
       </div>
       <div class="panel-body">
-        <form id="Decommission" method="post" action="#">
+        <form id="DecommissionWorkSpace" method="post" action="#">
           <div>
-            <input id="username" placeholder="User Name" name="username" type="text" maxlength="20" value="" required/>
+            <input id="decomWorkspaceId" placeholder="Workspace ID" type="text" maxlength="20" value="" required/>
           </div>
           <br>
           <button id="submit" type="submit" name="submit">
