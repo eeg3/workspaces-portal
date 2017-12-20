@@ -17,6 +17,12 @@ body {
   margin: 5px 0;
 }
 
+#RebootWorkSpace,
+#RebuildWorkSpace,
+#DecommissionWorkSpace {
+  text-align: center
+}
+
 #registrationForm,
 #signinForm,
 #verifyForm {
@@ -25,4 +31,13 @@ body {
 
 .authenticated {
   display: none !important;
+}
+
+#reloadButton {
+    background:none!important;
+    color:inherit;
+    border:none; 
+    padding:0!important;
+    font: inherit;
+    cursor: pointer;
 }

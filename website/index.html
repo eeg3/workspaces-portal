@@ -20,7 +20,7 @@ layout: default
     <div id="methodStatus" class="alert" role="alert"></div>
   </div>
 </div>
-<div class="row">
+<div class="row" id="DesktopNoExist">
   <div class="col-sm-6 col-sm-offset-3">
 
     <div class="panel panel-primary">
@@ -76,57 +76,62 @@ layout: default
     </div>
   </div>
 </div>
-<div class="row">
-  <div class="col-sm-8">
-      <div class="panel panel-primary">
-          <div class="panel-heading">
-            <h3 class="panel-title">WorkSpace Details</h3>
-          </div>
-          <div class="panel-body">
-              <table id="workspacesTable" class="table table-bordered table-hover">
-                  <thead>
-                    <tr>
-                      <th>WorkSpace ID</th>
-                      <th>Username</th>
-                      <th>State</th>
-                      <th>Bundle ID</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr><td id="workspace-Id"></td><td id="workspace-Username"></td><td id="workspace-State"></td><td id="workspace-Bundle"></td></tr>
-                  </tbody>
-                </table>
-          </div>
-        </div>
+<div class="row" id="DesktopExist">
+  <div class="col-sm-9">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">WorkSpace Details <button id="reloadButton"><i class="fa fa-refresh" aria-hidden="true"></i></button></i></h3>
+      </div>
+      <div class="panel-body">
+        <table id="workspacesTable" class="table table-bordered table-hover">
+          <thead>
+            <tr>
+              <th>WorkSpace ID</th>
+              <th>Username</th>
+              <th>State</th>
+              <th>Bundle ID</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td id="workspace-Id"></td>
+              <td id="workspace-Username"></td>
+              <td id="workspace-State"></td>
+              <td id="workspace-Bundle"></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-  <div class="col-sm-4">
-      <div class="panel panel-primary">
-          <div class="panel-heading">
-            <h3 class="panel-title">WorkSpace Operations</h3>
-          </div>
-          <div class="panel-body">
-            <form id="RebootRequest" method="post" action="#">
-              <button id="submit" type="submit" name="submit">
-                <span>Reboot WorkSpace</span>
-                <i></i>
-              </button>
-            </form>
-            <br>
-            <form id="RebuildRequest" method="post" action="#">
-                <button id="submit" type="submit" name="submit">
-                  <span>Rebuild WorkSpace</span>
-                  <i></i>
-                </button>
-              </form>
-              <br>
-              <form id="DecommissionWorkSpace" method="post" action="#">
-                  <button id="submit" type="submit" name="submit">
-                    <span>Delete WorkSpace</span>
-                    <i></i>
-                  </button>
-                </form>
-          </div>
-        </div>
+  <div class="col-sm-3">
+    <div class="panel panel-primary">
+      <div class="panel-heading">
+        <h3 class="panel-title">WorkSpace Operations</h3>
+      </div>
+      <div class="panel-body">
+        <form id="RebootWorkSpace" method="post" action="#">
+          <button id="submit" type="submit" name="submit">
+            <span>Reboot WorkSpace</span>
+            <i></i>
+          </button>
+        </form>
+        <br>
+        <form id="RebuildWorkSpace" method="post" action="#">
+          <button id="submit" type="submit" name="submit">
+            <span>Rebuild WorkSpace</span>
+            <i></i>
+          </button>
+        </form>
+        <br>
+        <form id="DecommissionWorkSpace" method="post" action="#">
+          <button id="submit" type="submit" name="submit">
+            <span>Delete WorkSpace</span>
+            <i></i>
+          </button>
+        </form>
+      </div>
+    </div>
   </div>
 </div>
 
