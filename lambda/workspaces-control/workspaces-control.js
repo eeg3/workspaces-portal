@@ -38,40 +38,53 @@ exports.handler = (event, context, callback) => {
 
         var params = [];
 
-        workspaces.describeWorkspaces(params, function (err, data) {
+        workspaces.describeWorkspaces(describeWorkspacesParams, function (err, data) {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
                 //console.log(data);
-                //console.log(data.Workspaces[0].WorkspaceId);
+                //console.log(data.Workspaces[0]);
 
                 for (var i = 0; i < data.Workspaces.length; i++) {
                     //console.log("Desktop[" + i + "]: " + data.Workspaces[i].WorkspaceId + " is owned by: " + data.Workspaces[i].UserName);
-
-                    var params = {
+                    var workspaceDetails = data[i];
+                    var describeTagsParams = {
                         ResourceId: data.Workspaces[i].WorkspaceId /* required */
                     };
-                    workspaces.describeTags(params, function (err, data) {
+
+                    workspaces.describeTags(describeTagsParams, function (err, data, workspaceDetails) {
                         if (err) {
                             console.log(err, err.stack);
                         } else {
-                            //console.log(data);
 
                             for (var i = 0; i < data.TagList.length; i++) {
 
                                 if (data.TagList[i].Key == "SelfServiceManaged" && data.TagList[i].Value == event.requestContext.authorizer.claims.email) {
-                                    console.log("Desktop for '" + event.requestContext.authorizer.claims.email + "' found: " + params.ResourceId);
-                                    callback(null, {
-                                        "statusCode": 200,
-                                        "body": JSON.stringify({
-                                            Result: params.ResourceId
-                                        }),
-                                        "headers": {
-                                            "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                                            "Access-Control-Allow-Methods": "GET,OPTIONS",
-                                            "Access-Control-Allow-Origin": originURL
+                                    console.log("Desktop for '" + event.requestContext.authorizer.claims.email + "' found: " + describeTagsParams.ResourceId);
+
+                                    var describeDetailsParams = {
+                                        WorkspaceIds: [
+                                            describeTagsParams.ResourceId
+                                        ]
+                                      };
+                                      workspaces.describeWorkspaces(describeDetailsParams, function(err, data) {
+
+                                        if(err) {
+                                            console.log(err, err.stack);
+                                        } else {
+                                            console.log("Finally: " + data);
+                                            callback(null, {
+                                                "statusCode": 200,
+                                                "body": JSON.stringify(data.Workspaces[0]),
+                                                "headers": {
+                                                    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                                                    "Access-Control-Allow-Methods": "GET,OPTIONS",
+                                                    "Access-Control-Allow-Origin": originURL
+                                                }
+                                            });
                                         }
-                                    });
+                                      });
+
                                 }
                             }
 

@@ -97,16 +97,14 @@ var authToken;
                 console.log("URL: " + WORKSPACES_CONTROL_URL);
                 console.log("Token: " + authToken);
                 console.log("json: " + JSON.stringify({
-                    action: 'delete',
-                    workspaceid: $('#decomWorkspaceId').val()
+                    action: 'delete'
                 }));
             },
             complete: function () {
                 //$('#loading-image').hide();
             },
             data: JSON.stringify({
-                action: 'delete',
-                workspaceid: $('#decomWorkspaceId').val()
+                action: 'delete'
             }),
             contentType: 'text/plain',
             error: function () {
