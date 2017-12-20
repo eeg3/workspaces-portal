@@ -155,7 +155,7 @@ var authToken;
             },
             success: function (data) {
                 $("#methodStatus").addClass("alert-success");
-                $("#methodStatus").html("<b>Success! WorkSpace rebuild in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully rebuilt.")
+                $("#methodStatus").html("<b>Success! WorkSpace rebuild in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully rebuilt. Once complete, an email will be sent with details.")
                 $("#methodStatus").show();
                 setTimeout(function () {
                     location.reload();
