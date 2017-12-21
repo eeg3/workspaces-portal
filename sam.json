@@ -18,8 +18,8 @@
         }
     },
     "Resources": {
-        "StepFunctionsRole": {
-            "Description": "Creating service role in IAM for Step Functions to API Gateway",
+        "ApprovalStepFunctionsRole": {
+            "Description": "Creating service role in IAM for Step Functions",
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "RoleName": {
@@ -39,7 +39,7 @@
                 "Path": "/"
             }
         },
-        "ManualStep": {
+        "ApprovalManualStep": {
             "Type": "AWS::StepFunctions::Activity",
             "Properties": {
                 "Name": {
@@ -47,7 +47,7 @@
                 }
             }
         },
-        "StateMachine": {
+        "ApprovalStateMachine": {
             "Type": "AWS::StepFunctions::StateMachine",
             "Properties": {
                 "StateMachineName": {
@@ -56,18 +56,18 @@
                 "DefinitionString": {
                     "Fn::Join": ["", ["{\"StartAt\": \"ManualApproval\", \"States\": {\"ManualApproval\": {\"Type\": \"Task\", \"Resource\": \"",
                         {
-                            "Ref": "ManualStep"
+                            "Ref": "ApprovalManualStep"
                         },
                         "\", \"End\": true}}}"
                     ]]
                 },
                 "RoleArn": {
-                    "Fn::GetAtt": ["StepFunctionsRole", "Arn"]
+                    "Fn::GetAtt": ["ApprovalStepFunctionsRole", "Arn"]
                 }
 
             }
         },
-        "MyRestApi": {
+        "ApprovalResponderAPI": {
             "Type": "AWS::ApiGateway::RestApi",
             "Properties": {
                 "Body": {
@@ -249,15 +249,15 @@
                         }
                     }
                 },
-                "Description": "A test API",
-                "Name": "MyRestAPI"
+                "Description": "Approval Responder API",
+                "Name": "ApprovalResponderAPI"
             }
         },
-        "Deployment": {
+        "ApprovalApiDeployment": {
             "Type": "AWS::ApiGateway::Deployment",
             "Properties": {
                 "RestApiId": {
-                    "Ref": "MyRestApi"
+                    "Ref": "ApprovalResponderAPI"
                 },
                 "Description": "Respond Deployment",
                 "StageName": "respond"
@@ -273,8 +273,12 @@
                 "Policies" : "AdministratorAccess",
                 "Environment": {
                     "Variables": {
-                        "TASK_ARN": "arn:aws:states:us-east-1:375301133253:activity:stepFun-Step",
-                        "API_DEPLOYMENT_ID": "p5tpyxxiu8",
+                        "TASK_ARN": {
+                            "Ref": "ApprovalManualStep"
+                        },
+                        "API_DEPLOYMENT_ID": {
+                            "Ref": "ApprovalApiDeployment"
+                        },
                         "FROM_ADDRESS": "approval@roundtower.io"
                     }
                 }
