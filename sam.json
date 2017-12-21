@@ -266,7 +266,7 @@
         "processAppoval": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
-                "Handler": "cogDomainVerify.handler",
+                "Handler": "process-approval.handler",
                 "Runtime": "nodejs4.3",
                 "CodeUri": "./lambda/process-approval/",
                 "Timeout": 75,
