@@ -249,7 +249,7 @@
                                 "iam:DeleteRole"
                             ],
                             "Resource": {
-                                "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/${AppName}-*"
+                                "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/*"
                             },
                             "Effect": "Allow"
                         },
