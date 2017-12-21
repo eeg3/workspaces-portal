@@ -255,6 +255,15 @@
                         },
                         {
                             "Action": [
+                                "states:*"
+                            ],
+                            "Resource": {
+                                "Fn::Sub": "arn:aws:states:${AWS::Region}:${AWS::AccountId}:activity:*"
+                            },
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
                                 "iam:AttachRolePolicy",
                                 "iam:DetachRolePolicy"
                             ],
