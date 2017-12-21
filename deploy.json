@@ -258,7 +258,7 @@
                                 "states:*"
                             ],
                             "Resource": {
-                                "Fn::Sub": "arn:aws:states:${AWS::Region}:${AWS::AccountId}:activity:*"
+                                "Fn::Sub": "arn:aws:states:${AWS::Region}:${AWS::AccountId}:*"
                             },
                             "Effect": "Allow"
                         },
