@@ -5,14 +5,11 @@ const aws = require('aws-sdk');
 const stepfunctions = new aws.StepFunctions();
 const ses = new aws.SES();
 exports.handler = (event, context, callback) => {
-    var environment = process.env.NODE_ENV; 
-    console.log("FUNCTION STARTING");
     var taskParams = {
-        activityArn: process.env.TASK_ARN //'arn:aws:states:us-east-1:375301133253:activity:stepFun-Step'
+        activityArn: process.env.TASK_ARN 
     };
     
     stepfunctions.getActivityTask(taskParams, function(err, data) {
-        console.log("GETACTIVITYTASK RUNNING");
         if (err) {
             console.log(err, err.stack);
             context.fail('An error occured while calling getActivityTask.');
@@ -35,7 +32,7 @@ exports.handler = (event, context, callback) => {
                     },
                     Message: {
                         Subject: {
-                            Data: 'Your Approval Needed for Promotion!',
+                            Data: 'Your Approval Needed!',
                             Charset: 'UTF-8'
                         },
                         Body: {
