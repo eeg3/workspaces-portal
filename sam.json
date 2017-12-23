@@ -131,7 +131,19 @@
                     }]
                 },
                 "Path": "/",
-                "Policies": "AdministratorAccess"
+                "Policies": {
+                    "PolicyName": "workspaceCreateInvoke",
+                    "PolicyDocument": {
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": "lambda:InvokeFunction",
+                            "Resource": [{
+                                "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                            }]
+                        }]
+                    }
+                }
+
             }
         },
         "approvalManualActivity": {
@@ -154,10 +166,10 @@
                             "Ref": "approvalManualActivity"
                         },
                         "\",\"TimeoutSeconds\": 3600,\"Next\": \"workspacesCreate\"},\"workspacesCreate\": {\"Type\": \"Task\",\"Resource\": \"",
-                            {
-                                "Fn::GetAtt": ["workspacesCreate", "Arn"]
-                            },
-                            "\",\"End\": true}}}"
+                        {
+                            "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                        },
+                        "\",\"End\": true}}}"
                     ]]
                 },
                 "RoleArn": {
