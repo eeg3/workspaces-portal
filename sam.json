@@ -148,11 +148,15 @@
                     "Fn::Sub": "${AppName}-StateMachine"
                 },
                 "DefinitionString": {
-                    "Fn::Join": ["", ["{\"StartAt\": \"ManualApproval\", \"States\": {\"ManualApproval\": {\"Type\": \"Task\", \"Resource\": \"",
+                    "Fn::Join": ["", ["{\"StartAt\": \"ManualApproval\",\"States\": {\"ManualApproval\": {\"Type\": \"Task\",\"Resource\": \"",
                         {
                             "Ref": "approvalManualActivity"
                         },
-                        "\", \"End\": true}}}"
+                        "\",\"TimeoutSeconds\": 3600,\"Next\": \"LambdaFun\"},\"LambdaFun\": {\"Type\": \"Task\",\"Resource\": \"",
+                            {
+                                "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                            },
+                            "\",\"End\": true}}}"
                     ]]
                 },
                 "RoleArn": {
