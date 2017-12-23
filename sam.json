@@ -131,7 +131,7 @@
                     }]
                 },
                 "Path": "/",
-                "Policies": {
+                "Policies": [{
                     "PolicyName": "workspaceCreateInvoke",
                     "PolicyDocument": {
                         "Statement": [{
@@ -142,8 +142,7 @@
                             }]
                         }]
                     }
-                }
-
+                }]
             }
         },
         "approvalManualActivity": {
