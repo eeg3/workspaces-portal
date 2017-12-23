@@ -288,6 +288,15 @@
                         },
                         {
                             "Action": [
+                                "events:*"
+                            ],
+                            "Resource": [
+                                "*"
+                            ],
+                            "Effect": "Allow"
+                        },
+                        {
+                            "Action": [
                                 "cloudformation:CreateChangeSet"
                             ],
                             "Resource": {
