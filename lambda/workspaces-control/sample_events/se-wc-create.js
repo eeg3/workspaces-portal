@@ -1,7 +1,12 @@
 module.exports =
 {
     "requestContext": {
-        "httpMethod": "POST"
+        "httpMethod": "POST",
+        "authorizer": {
+            "claims": {
+                "email": "earl@eeg3.net"
+            }
+        }
     },
-    "body": "{\"action\":\"create\",\"username\":\"earltest\",\"bundle\":\"wsb-92tn3b7gx\"}"
+    "body": "{\"action\":\"create\",\"username\":\"earl\",\"bundle\":\"wsb-92tn3b7gx\"}"
 };
