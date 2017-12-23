@@ -246,7 +246,12 @@
                             "Action": [
                                 "iam:GetRole",
                                 "iam:CreateRole",
-                                "iam:DeleteRole"
+                                "iam:DeleteRole",
+                                "iam:AttachRolePolicy",
+                                "iam:DetachRolePolicy",
+                                "iam:PutRolePolicy",
+                                "iam:DeleteRolePolicy",
+                                "iam:UpdateAssumeRolePolicy"
                             ],
                             "Resource": {
                                 "Fn::Sub": "arn:aws:iam::${AWS::AccountId}:role/*"
