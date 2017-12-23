@@ -1,0 +1,14 @@
+{
+  "name": "workspaces-create",
+  "version": "1.0.0",
+  "description": "Create AWS WorkSpace.",
+  "main": "workspaces-create.js",
+  "scripts": {
+    "test": "lambda-local -l workspaces-create.js -e sample_events/se-workspaces-create.js"
+  },
+  "author": "Earl Gay",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "aws-sdk": "^2.175.0"
+  }
+}

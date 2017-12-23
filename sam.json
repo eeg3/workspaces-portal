@@ -263,27 +263,6 @@
                 "StageName": "respond"
             }
         },
-        "processAppoval": {
-            "Type": "AWS::Serverless::Function",
-            "Properties": {
-                "Handler": "process-approval.handler",
-                "Runtime": "nodejs4.3",
-                "CodeUri": "./lambda/process-approval/",
-                "Timeout": 75,
-                "Policies" : "AdministratorAccess",
-                "Environment": {
-                    "Variables": {
-                        "TASK_ARN": {
-                            "Ref": "ApprovalManualStep"
-                        },
-                        "API_DEPLOYMENT_ID": {
-                            "Ref": "ApprovalApiDeployment"
-                        },
-                        "FROM_ADDRESS": "approval@roundtower.io"
-                    }
-                }
-            }
-        },
         "cogDomainVerify": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
@@ -307,7 +286,7 @@
                 }
             }
         },
-        "workspacescontrol": {
+        "workspacesControl": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "workspaces-control.handler",
@@ -318,7 +297,48 @@
                     "Variables": {
                         "ORIGIN_URL": {
                             "Ref": "OriginUrl"
+                        },
+                        "STATE_MACHINE_ARN": {
+                            "Ref": "ApprovalStateMachine"
                         }
+                    }
+                }
+            }
+        },
+        "workspacesCreate": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "workspaces-create.handler",
+                "Runtime": "nodejs4.3",
+                "CodeUri": "./lambda/workspaces-create/",
+                "Policies": "AmazonWorkSpacesAdmin",
+                "Environment": {
+                    "Variables": {
+                        "ORIGIN_URL": {
+                            "Ref": "OriginUrl"
+                        }
+                    }
+                }
+            }
+        },
+        "workspacesAppoval": {
+            "Type": "AWS::Serverless::Function",
+            "Properties": {
+                "Handler": "workspaces-approval.handler",
+                "Runtime": "nodejs4.3",
+                "CodeUri": "./lambda/workspaces-approval/",
+                "Timeout": 75,
+                "Policies" : "AdministratorAccess",
+                "Environment": {
+                    "Variables": {
+                        "TASK_ARN": {
+                            "Ref": "ApprovalManualStep"
+                        },
+                        "API_DEPLOYMENT_ID": {
+                            "Ref": "ApprovalApiDeployment"
+                        },
+                        "FROM_ADDRESS": "approval@roundtower.io",
+                        "APPROVER_EMAIL_ADDRESS": "earl@eeg3.net"
                     }
                 }
             }
