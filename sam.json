@@ -14,255 +14,20 @@
             "MaxLength": "80",
             "AllowedPattern": "[A-Za-z0-9-]+",
             "ConstraintDescription": "Malformed input parameter. AppName must only contain upper and lower case letters, numbers, and -.",
-            "Default": "approvalApp"
+            "Default": "wsPortal"
+        },
+        "PortalEmail": {
+            "Type": "String",
+            "Description": "Address from which emails will be sent from to approvers.",
+            "Default": "approval@roundtower.io"
+        },
+        "ApproverEmail": {
+            "Type": "String",
+            "Description": "Email address that will receive WorkSpace Creation approval requests.",
+            "Default": "earl@eeg3.net"
         }
     },
     "Resources": {
-        "ApprovalStepFunctionsRole": {
-            "Description": "Creating service role in IAM for Step Functions",
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "RoleName": {
-                    "Fn::Sub": "${AppName}-role"
-                },
-                "AssumeRolePolicyDocument": {
-                    "Statement": [{
-                        "Effect": "Allow",
-                        "Principal": {
-                            "Service": [
-                                "states.us-east-1.amazonaws.com"
-                            ]
-                        },
-                        "Action": "sts:AssumeRole"
-                    }]
-                },
-                "Path": "/"
-            }
-        },
-        "ApprovalManualStep": {
-            "Type": "AWS::StepFunctions::Activity",
-            "Properties": {
-                "Name": {
-                    "Fn::Sub": "${AppName}-Step"
-                }
-            }
-        },
-        "ApprovalStateMachine": {
-            "Type": "AWS::StepFunctions::StateMachine",
-            "Properties": {
-                "StateMachineName": {
-                    "Fn::Sub": "${AppName}-StateMachine"
-                },
-                "DefinitionString": {
-                    "Fn::Join": ["", ["{\"StartAt\": \"ManualApproval\", \"States\": {\"ManualApproval\": {\"Type\": \"Task\", \"Resource\": \"",
-                        {
-                            "Ref": "ApprovalManualStep"
-                        },
-                        "\", \"End\": true}}}"
-                    ]]
-                },
-                "RoleArn": {
-                    "Fn::GetAtt": ["ApprovalStepFunctionsRole", "Arn"]
-                }
-
-            }
-        },
-        "ApprovalResponderAPI": {
-            "Type": "AWS::ApiGateway::RestApi",
-            "Properties": {
-                "Body": {
-                    "swagger": "2.0",
-                    "info": {
-                        "version": "2017-12-20T19:01:15Z",
-                        "title": "Step Functions API"
-                    },
-                    "basePath": "/respond",
-                    "schemes": [
-                        "https"
-                    ],
-                    "paths": {
-                        "/fail": {
-                            "get": {
-                                "consumes": [
-                                    "application/json"
-                                ],
-                                "produces": [
-                                    "application/json"
-                                ],
-                                "parameters": [{
-                                    "name": "taskToken",
-                                    "in": "query",
-                                    "required": false,
-                                    "type": "string"
-                                }],
-                                "responses": {
-                                    "200": {
-                                        "description": "200 response",
-                                        "schema": {
-                                            "$ref": "#/definitions/Empty"
-                                        }
-                                    }
-                                },
-                                "x-amazon-apigateway-integration": {
-                                    "credentials": "arn:aws:iam::375301133253:role/APIGatewayToStepFunctions",
-                                    "responses": {
-                                        "default": {
-                                            "statusCode": "200"
-                                        }
-                                    },
-                                    "requestTemplates": {
-                                        "application/json": "{\n   \"cause\": \"Reject link was clicked.\",\n   \"error\": \"Rejected\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
-                                    },
-                                    "uri": "arn:aws:apigateway:us-east-1:states:action/SendTaskFailure",
-                                    "passthroughBehavior": "when_no_templates",
-                                    "httpMethod": "POST",
-                                    "type": "aws"
-                                }
-                            },
-                            "options": {
-                                "consumes": [
-                                    "application/json"
-                                ],
-                                "produces": [
-                                    "application/json"
-                                ],
-                                "responses": {
-                                    "200": {
-                                        "description": "200 response",
-                                        "schema": {
-                                            "$ref": "#/definitions/Empty"
-                                        },
-                                        "headers": {
-                                            "Access-Control-Allow-Origin": {
-                                                "type": "string"
-                                            },
-                                            "Access-Control-Allow-Methods": {
-                                                "type": "string"
-                                            },
-                                            "Access-Control-Allow-Headers": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                },
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "default": {
-                                            "statusCode": "200",
-                                            "responseParameters": {
-                                                "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
-                                                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
-                                                "method.response.header.Access-Control-Allow-Origin": "'*'"
-                                            }
-                                        }
-                                    },
-                                    "requestTemplates": {
-                                        "application/json": "{\"statusCode\": 200}"
-                                    },
-                                    "passthroughBehavior": "when_no_match",
-                                    "type": "mock"
-                                }
-                            }
-                        },
-                        "/succeed": {
-                            "get": {
-                                "consumes": [
-                                    "application/json"
-                                ],
-                                "produces": [
-                                    "application/json"
-                                ],
-                                "responses": {
-                                    "200": {
-                                        "description": "200 response",
-                                        "schema": {
-                                            "$ref": "#/definitions/Empty"
-                                        }
-                                    }
-                                },
-                                "x-amazon-apigateway-integration": {
-                                    "credentials": "arn:aws:iam::375301133253:role/APIGatewayToStepFunctions",
-                                    "responses": {
-                                        "default": {
-                                            "statusCode": "200"
-                                        }
-                                    },
-                                    "requestTemplates": {
-                                        "application/json": "{\n   \"output\": \"\\\"Approve link was clicked.\\\"\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
-                                    },
-                                    "uri": "arn:aws:apigateway:us-east-1:states:action/SendTaskSuccess",
-                                    "passthroughBehavior": "when_no_templates",
-                                    "httpMethod": "POST",
-                                    "type": "aws"
-                                }
-                            },
-                            "options": {
-                                "consumes": [
-                                    "application/json"
-                                ],
-                                "produces": [
-                                    "application/json"
-                                ],
-                                "responses": {
-                                    "200": {
-                                        "description": "200 response",
-                                        "schema": {
-                                            "$ref": "#/definitions/Empty"
-                                        },
-                                        "headers": {
-                                            "Access-Control-Allow-Origin": {
-                                                "type": "string"
-                                            },
-                                            "Access-Control-Allow-Methods": {
-                                                "type": "string"
-                                            },
-                                            "Access-Control-Allow-Headers": {
-                                                "type": "string"
-                                            }
-                                        }
-                                    }
-                                },
-                                "x-amazon-apigateway-integration": {
-                                    "responses": {
-                                        "default": {
-                                            "statusCode": "200",
-                                            "responseParameters": {
-                                                "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
-                                                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
-                                                "method.response.header.Access-Control-Allow-Origin": "'*'"
-                                            }
-                                        }
-                                    },
-                                    "requestTemplates": {
-                                        "application/json": "{\"statusCode\": 200}"
-                                    },
-                                    "passthroughBehavior": "when_no_match",
-                                    "type": "mock"
-                                }
-                            }
-                        }
-                    },
-                    "definitions": {
-                        "Empty": {
-                            "type": "object",
-                            "title": "Empty Schema"
-                        }
-                    }
-                },
-                "Description": "Approval Responder API",
-                "Name": "ApprovalResponderAPI"
-            }
-        },
-        "ApprovalApiDeployment": {
-            "Type": "AWS::ApiGateway::Deployment",
-            "Properties": {
-                "RestApiId": {
-                    "Ref": "ApprovalResponderAPI"
-                },
-                "Description": "Respond Deployment",
-                "StageName": "respond"
-            }
-        },
         "cogDomainVerify": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
@@ -299,7 +64,7 @@
                             "Ref": "OriginUrl"
                         },
                         "STATE_MACHINE_ARN": {
-                            "Ref": "ApprovalStateMachine"
+                            "Ref": "approvalStateMachine"
                         }
                     }
                 }
@@ -328,19 +93,268 @@
                 "Runtime": "nodejs4.3",
                 "CodeUri": "./lambda/workspaces-approval/",
                 "Timeout": 75,
-                "Policies" : "AdministratorAccess",
+                "Policies": "AdministratorAccess",
                 "Environment": {
                     "Variables": {
                         "TASK_ARN": {
-                            "Ref": "ApprovalManualStep"
+                            "Ref": "approvalManualActivity"
                         },
                         "API_DEPLOYMENT_ID": {
-                            "Ref": "ApprovalApiDeployment"
+                            "Ref": "approvalApiDeployment"
                         },
-                        "FROM_ADDRESS": "approval@roundtower.io",
-                        "APPROVER_EMAIL_ADDRESS": "earl@eeg3.net"
+                        "FROM_ADDRESS": {
+                            "Ref": "PortalEmail"
+                        },
+                        "APPROVER_EMAIL_ADDRESS": {
+                            "Ref": "ApproverEmail"
+                        }
                     }
                 }
+            }
+        },
+        "approvalStepFunctionsRole": {
+            "Description": "Creating service role in IAM for Step Functions",
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "${AppName}-role"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": [{
+                                "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
+                            }]
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Path": "/"
+            }
+        },
+        "approvalManualActivity": {
+            "Type": "AWS::StepFunctions::Activity",
+            "Properties": {
+                "Name": {
+                    "Fn::Sub": "${AppName}-Step"
+                }
+            }
+        },
+        "approvalStateMachine": {
+            "Type": "AWS::StepFunctions::StateMachine",
+            "Properties": {
+                "StateMachineName": {
+                    "Fn::Sub": "${AppName}-StateMachine"
+                },
+                "DefinitionString": {
+                    "Fn::Join": ["", ["{\"StartAt\": \"ManualApproval\", \"States\": {\"ManualApproval\": {\"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Ref": "approvalManualActivity"
+                        },
+                        "\", \"End\": true}}}"
+                    ]]
+                },
+                "RoleArn": {
+                    "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
+                }
+
+            }
+        },
+        "approvalResponderAPI": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+                "Body": {
+                    "swagger": "2.0",
+                    "info": {
+                        "version": "2017-12-20T19:01:15Z",
+                        "title": "ApprovalResponderAPI"
+                    },
+                    "basePath": "/respond",
+                    "schemes": [
+                        "https"
+                    ],
+                    "paths": {
+                        "/fail": {
+                            "get": {
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ],
+                                "parameters": [{
+                                    "name": "taskToken",
+                                    "in": "query",
+                                    "required": false,
+                                    "type": "string"
+                                }],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "credentials": "arn:aws:iam::375301133253:role/APIGatewayToStepFunctions",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": "arn:aws:apigateway:us-east-1:states:action/SendTaskFailure",
+                                    "passthroughBehavior": "when_no_templates",
+                                    "httpMethod": "POST",
+                                    "requestTemplates": {
+                                        "application/json": "{\n   \"cause\": \"Reject link was clicked.\",\n   \"error\": \"Rejected\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
+                                    },
+                                    "type": "aws"
+                                }
+                            },
+                            "options": {
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        },
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200",
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'"
+                                            }
+                                        }
+                                    },
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "type": "mock"
+                                }
+                            }
+                        },
+                        "/succeed": {
+                            "get": {
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "credentials": "arn:aws:iam::375301133253:role/APIGatewayToStepFunctions",
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200"
+                                        }
+                                    },
+                                    "uri": "arn:aws:apigateway:us-east-1:states:action/SendTaskSuccess",
+                                    "passthroughBehavior": "when_no_templates",
+                                    "httpMethod": "POST",
+                                    "requestTemplates": {
+                                        "application/json": "{\n   \"output\": \"\\\"$input.params('requesterEmailAddress'),$input.params('requesterUsername'),$input.params('requesterBundle')\\\"\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
+                                    },
+                                    "type": "aws"
+                                }
+                            },
+                            "options": {
+                                "consumes": [
+                                    "application/json"
+                                ],
+                                "produces": [
+                                    "application/json"
+                                ],
+                                "responses": {
+                                    "200": {
+                                        "description": "200 response",
+                                        "schema": {
+                                            "$ref": "#/definitions/Empty"
+                                        },
+                                        "headers": {
+                                            "Access-Control-Allow-Origin": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Methods": {
+                                                "type": "string"
+                                            },
+                                            "Access-Control-Allow-Headers": {
+                                                "type": "string"
+                                            }
+                                        }
+                                    }
+                                },
+                                "x-amazon-apigateway-integration": {
+                                    "responses": {
+                                        "default": {
+                                            "statusCode": "200",
+                                            "responseParameters": {
+                                                "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                                                "method.response.header.Access-Control-Allow-Headers": "'Content-Type,Authorization,X-Amz-Date,X-Api-Key,X-Amz-Security-Token'",
+                                                "method.response.header.Access-Control-Allow-Origin": "'*'"
+                                            }
+                                        }
+                                    },
+                                    "passthroughBehavior": "when_no_match",
+                                    "requestTemplates": {
+                                        "application/json": "{\"statusCode\": 200}"
+                                    },
+                                    "type": "mock"
+                                }
+                            }
+                        }
+                    },
+                    "definitions": {
+                        "Empty": {
+                            "type": "object",
+                            "title": "Empty Schema"
+                        }
+                    }
+                },
+                "Description": "Approval Responder API",
+                "Name": "approvalResponderAPI"
+            }
+        },
+        "approvalApiDeployment": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+                "RestApiId": {
+                    "Ref": "approvalResponderAPI"
+                },
+                "Description": "Respond Deployment",
+                "StageName": "respond"
             }
         }
     }
