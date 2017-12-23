@@ -130,7 +130,8 @@
                         "Action": "sts:AssumeRole"
                     }]
                 },
-                "Path": "/"
+                "Path": "/",
+                "Policies": "AdministratorAccess"
             }
         },
         "approvalManualActivity": {
