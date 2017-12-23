@@ -109,6 +109,14 @@
                             "Ref": "ApproverEmail"
                         }
                     }
+                },
+                "Events": {
+                    "Timer": {
+                        "Type": "Schedule",
+                        "Properties": {
+                            "Schedule": "rate(5 minutes)"
+                        }
+                    }
                 }
             }
         },
