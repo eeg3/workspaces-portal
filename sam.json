@@ -152,7 +152,7 @@
                         {
                             "Ref": "approvalManualActivity"
                         },
-                        "\",\"TimeoutSeconds\": 3600,\"Next\": \"LambdaFun\"},\"workspacesCreate\": {\"Type\": \"Task\",\"Resource\": \"",
+                        "\",\"TimeoutSeconds\": 3600,\"Next\": \"workspacesCreate\"},\"workspacesCreate\": {\"Type\": \"Task\",\"Resource\": \"",
                             {
                                 "Fn::GetAtt": ["workspacesCreate", "Arn"]
                             },
