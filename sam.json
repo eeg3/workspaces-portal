@@ -70,9 +70,6 @@
                         },
                         "STATE_MACHINE_ARN": {
                             "Ref": "approvalStateMachine"
-                        },
-                        "DIRECTORY_ID": {
-                            "Ref": "DirectoryServicesId"
                         }
                     }
                 }
@@ -89,6 +86,9 @@
                     "Variables": {
                         "ORIGIN_URL": {
                             "Ref": "OriginUrl"
+                        },
+                        "DIRECTORY_ID": {
+                            "Ref": "DirectoryServicesId"
                         }
                     }
                 }
