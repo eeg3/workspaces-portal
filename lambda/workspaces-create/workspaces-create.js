@@ -13,7 +13,7 @@ var workspaces = new AWS.WorkSpaces({
 });
 
 var config = {
-    Directory: 'd-90672a878e',
+    Directory: process.env.DIRECTORY_ID || 'd-90672a878e',
     Mode: 'AUTO_STOP',
     UsageTimeout: 60
 }
@@ -61,7 +61,6 @@ exports.handler = (event, context, callback) => {
                 },
             });
         } else {
-            // TODO: Check if "FailedRequests" is empty and PendingRequest has a member.
             console.log("Result: " + JSON.stringify(data));
             callback(null, {
                 "statusCode": 200,

@@ -9,7 +9,7 @@
         },
         "AppName": {
             "Type": "String",
-            "Description": "Name of the application.",
+            "Description": "Name of the portal.",
             "MinLength": "1",
             "MaxLength": "80",
             "AllowedPattern": "[A-Za-z0-9-]+",
@@ -25,6 +25,11 @@
             "Type": "String",
             "Description": "Email address that will receive WorkSpace Creation approval requests.",
             "Default": "earl@eeg3.net"
+        },
+        "DirectoryServicesId": {
+            "Type": "String",
+            "Description": "Directory Services ID configured within Amazon WorkSpaces.",
+            "Default": "d-90672a878e"
         }
     },
     "Resources": {
@@ -65,6 +70,9 @@
                         },
                         "STATE_MACHINE_ARN": {
                             "Ref": "approvalStateMachine"
+                        },
+                        "DIRECTORY_ID": {
+                            "Ref": "DirectoryServicesId"
                         }
                     }
                 }

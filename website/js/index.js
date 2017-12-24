@@ -38,15 +38,8 @@ var authToken;
     function handleRequest(event) {
         event.preventDefault();
 
-        // TODO: Add logic to grab the username from requestContext.authorizer.email or .cognito:username and set that 
-        //  to the SelfServiceManaged tag key's value of the WorkSpace. This tag can then be used to validate any 
-        //  operations like reboot/rebuild/decom later. 
-        //  We have to do this because querying SimpleAD through awscli isn't available, so querying values to verify would
-        //  require a separate manually created DS API. We need to do some matching to avoid users interacting with other users machines.
-
         var username = $('#reqUsername').val();
         var bundle = $('#reqBundle').val();
-
 
         $.ajax({
             method: 'POST',
@@ -55,7 +48,6 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                //$('#loading-image').show();
                 console.log("URL: " + WORKSPACES_CONTROL_URL);
                 console.log("Token: " + authToken);
                 console.log("json: " + JSON.stringify({
@@ -65,7 +57,6 @@ var authToken;
                 }));
             },
             complete: function () {
-                //$('#loading-image').hide();
             },
             data: JSON.stringify({
                 action: 'create',
@@ -80,7 +71,7 @@ var authToken;
             },
             success: function (data) {
                 $("#methodStatus").addClass("alert-success");
-                $("#methodStatus").html("<b>Success! WorkSpace request submitted...</b> This request must be approved before the WorkSpace will be created. An email has been sent to " + _config.approval.email + " to authorize this request. Once approved, the WorkSpace will be created automatically and an email will be sent to your email with instructions for access.");
+                $("#methodStatus").html("<b>Success! WorkSpace request submitted...</b> This request must be approved before the WorkSpace will be created. An email has been sent to <b>" + _config.approval.email + "</b> to authorize this request. Once approved, the WorkSpace will be created automatically and an email will be sent to your email with instructions for access.");
                 $("#methodStatus").show();
             }
         });
@@ -97,13 +88,11 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                //$('#loading-image').show();
                 console.log("json: " + JSON.stringify({
                     action: 'reboot'
                 }));
             },
             complete: function () {
-                //$('#loading-image').hide();
             },
             data: JSON.stringify({
                 action: 'reboot'
@@ -136,13 +125,11 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                //$('#loading-image').show();
                 console.log("json: " + JSON.stringify({
                     action: 'rebuild'
                 }));
             },
             complete: function () {
-                //$('#loading-image').hide();
             },
             data: JSON.stringify({
                 action: 'rebuild'
@@ -168,10 +155,6 @@ var authToken;
     function handleDecommission(event) {
         event.preventDefault();
 
-        // TODO: Add logic to grab the username from requestContext.authorizer.email or .cognito:username and verify match 
-        //  against the SelfServiceManaged tag's value of the WorkSpace before allowing to proceed. If WorkSpace wasn't created 
-        //  through SSP then we won't interact with it.
-
         $.ajax({
             method: 'POST',
             url: WORKSPACES_CONTROL_URL,
@@ -179,7 +162,6 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                //$('#loading-image').show();
                 console.log("URL: " + WORKSPACES_CONTROL_URL);
                 console.log("Token: " + authToken);
                 console.log("json: " + JSON.stringify({
@@ -187,7 +169,6 @@ var authToken;
                 }));
             },
             complete: function () {
-                //$('#loading-image').hide();
             },
             data: JSON.stringify({
                 action: 'delete'
@@ -221,13 +202,11 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                //$('#loading-image').show();
                 console.log("json: " + JSON.stringify({
                     action: 'list'
                 }));
             },
             complete: function () {
-                //$('#loading-image').hide();
             },
             data: JSON.stringify({
                 action: 'list'
