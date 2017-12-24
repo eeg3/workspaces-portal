@@ -100,7 +100,7 @@
                             "Ref": "approvalManualActivity"
                         },
                         "API_DEPLOYMENT_ID": {
-                            "Ref": "approvalApiDeployment"
+                            "Ref": "approvalResponderAPI"
                         },
                         "FROM_ADDRESS": {
                             "Ref": "PortalEmail"
@@ -114,7 +114,7 @@
                     "Timer": {
                         "Type": "Schedule",
                         "Properties": {
-                            "Schedule": "rate(5 minutes)"
+                            "Schedule": "rate(10 minutes)"
                         }
                     }
                 }

@@ -6,5 +6,8 @@ window._config = {
     },
     api: {
         invokeUrl: 'https://fo2o3q0ge7.execute-api.us-east-1.amazonaws.com/Prod' // e.g. https://rc7nyt4tql.execute-api.us-west-2.amazonaws.com/prod',
+    },
+    approval: {
+        email: 'earl@eeg3.net'
     }
 };

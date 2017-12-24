@@ -80,7 +80,7 @@ var authToken;
             },
             success: function (data) {
                 $("#methodStatus").addClass("alert-success");
-                $("#methodStatus").html("<b>Success! WorkSpace creation in-progress...</b> Please allow up to 30 minutes for the virtual desktop to be provisioned. Once complete, an email will be sent with instructions.")
+                $("#methodStatus").html("<b>Success! WorkSpace request submitted...</b> This request must be approved before the WorkSpace will be created. An email has been sent to " + _config.approval.email + " to authorize this request. Once approved, the WorkSpace will be created automatically and an email will be sent to your email with instructions for access.");
                 $("#methodStatus").show();
             }
         });
