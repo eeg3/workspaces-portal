@@ -230,7 +230,9 @@
                                     }
                                 },
                                 "x-amazon-apigateway-integration": {
-                                    "credentials": "arn:aws:iam::375301133253:role/APIGatewayToStepFunctions",
+                                    "credentials": {
+                                        "Fn::Get": ["approvalStepFunctionsRole", "Arn"]
+                                    },
                                     "responses": {
                                         "default": {
                                             "statusCode": "200"
@@ -307,7 +309,9 @@
                                     }
                                 },
                                 "x-amazon-apigateway-integration": {
-                                    "credentials": "arn:aws:iam::375301133253:role/APIGatewayToStepFunctions",
+                                    "credentials": {
+                                        "Fn::Get": ["approvalStepFunctionsRole", "Arn"]
+                                    },
                                     "responses": {
                                         "default": {
                                             "statusCode": "200"
