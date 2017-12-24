@@ -14,13 +14,6 @@ var workspaces = new AWS.WorkSpaces({
 
 var stepfunctions = new AWS.StepFunctions();
 
-var config = {
-    Directory: 'd-90672a878e',
-    Mode: 'AUTO_STOP',
-    UsageTimeout: 60
-
-}
-
 exports.handler = (event, context, callback) => {
 
     var originURL = process.env.ORIGIN_URL || '*';
@@ -40,11 +33,9 @@ exports.handler = (event, context, callback) => {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
-                //console.log(data);
-                //console.log(data.Workspaces[0]);
+
 
                 for (var i = 0; i < data.Workspaces.length; i++) {
-                    //console.log("Desktop[" + i + "]: " + data.Workspaces[i].WorkspaceId + " is owned by: " + data.Workspaces[i].UserName);
                     var workspaceDetails = data[i];
                     var describeTagsParams = {
                         ResourceId: data.Workspaces[i].WorkspaceId /* required */
@@ -94,7 +85,6 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "create") {
-        console.log("we got here...");
         var stepParams = {
             stateMachineArn: stateMachine, /* required */
             input: JSON.stringify({
@@ -104,7 +94,6 @@ exports.handler = (event, context, callback) => {
             })
           };
           stepfunctions.startExecution(stepParams, function(err, data) {
-              console.log("sfn ran");
             if (err) {
                 console.log(err, err.stack);
             } else {
@@ -129,11 +118,8 @@ exports.handler = (event, context, callback) => {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
-                //console.log(data);
-                //console.log(data.Workspaces[0].WorkspaceId);
 
                 for (var i = 0; i < data.Workspaces.length; i++) {
-                    //console.log("Desktop[" + i + "]: " + data.Workspaces[i].WorkspaceId + " is owned by: " + data.Workspaces[i].UserName);
 
                     var describeTagsParams = {
                         ResourceId: data.Workspaces[i].WorkspaceId /* required */
@@ -142,8 +128,6 @@ exports.handler = (event, context, callback) => {
                         if (err) {
                             console.log(err, err.stack);
                         } else {
-                            //console.log(data);
-
                             for (var i = 0; i < data.TagList.length; i++) {
                                 if (data.TagList[i].Key == "SelfServiceManaged" && data.TagList[i].Value == event.requestContext.authorizer.claims.email) {
                                     console.log("Desktop for '" + event.requestContext.authorizer.claims.email + "' found: " + describeTagsParams.ResourceId);
@@ -170,7 +154,6 @@ exports.handler = (event, context, callback) => {
                                                 },
                                             });
                                         } else {
-                                            // TODO: Check if "FailedRequests" is empty.
                                             console.log("Result: " + JSON.stringify(data));
                                             
                                             callback(null, {
@@ -206,11 +189,8 @@ exports.handler = (event, context, callback) => {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
-                //console.log(data);
-                //console.log(data.Workspaces[0].WorkspaceId);
 
                 for (var i = 0; i < data.Workspaces.length; i++) {
-                    //console.log("Desktop[" + i + "]: " + data.Workspaces[i].WorkspaceId + " is owned by: " + data.Workspaces[i].UserName);
 
                     var describeTagsParams = {
                         ResourceId: data.Workspaces[i].WorkspaceId /* required */
@@ -219,7 +199,6 @@ exports.handler = (event, context, callback) => {
                         if (err) {
                             console.log(err, err.stack);
                         } else {
-                            //console.log(data);
 
                             for (var i = 0; i < data.TagList.length; i++) {
                                 if (data.TagList[i].Key == "SelfServiceManaged" && data.TagList[i].Value == event.requestContext.authorizer.claims.email) {
@@ -247,7 +226,6 @@ exports.handler = (event, context, callback) => {
                                                 },
                                             });
                                         } else {
-                                            // TODO: Check if "FailedRequests" is empty.
                                             console.log("Result: " + JSON.stringify(data));
                                             
                                             callback(null, {
@@ -283,11 +261,8 @@ exports.handler = (event, context, callback) => {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
-                //console.log(data);
-                //console.log(data.Workspaces[0].WorkspaceId);
 
                 for (var i = 0; i < data.Workspaces.length; i++) {
-                    //console.log("Desktop[" + i + "]: " + data.Workspaces[i].WorkspaceId + " is owned by: " + data.Workspaces[i].UserName);
 
                     var describeTagsParams = {
                         ResourceId: data.Workspaces[i].WorkspaceId /* required */
@@ -296,7 +271,6 @@ exports.handler = (event, context, callback) => {
                         if (err) {
                             console.log(err, err.stack);
                         } else {
-                            //console.log(data);
 
                             for (var i = 0; i < data.TagList.length; i++) {
                                 if (data.TagList[i].Key == "SelfServiceManaged" && data.TagList[i].Value == event.requestContext.authorizer.claims.email) {
@@ -324,7 +298,6 @@ exports.handler = (event, context, callback) => {
                                                 },
                                             });
                                         } else {
-                                            // TODO: Check if "FailedRequests" is empty.
                                             console.log("Result: " + JSON.stringify(data));
                                             
                                             callback(null, {

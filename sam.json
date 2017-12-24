@@ -41,21 +41,6 @@
                 "CodeUri": "./lambda/cognito-domainVerify/"
             }
         },
-        "squirrel": {
-            "Type": "AWS::Serverless::Function",
-            "Properties": {
-                "Handler": "sam.handler",
-                "Runtime": "nodejs4.3",
-                "CodeUri": "./lambda/squirrel/",
-                "Environment": {
-                    "Variables": {
-                        "ORIGIN_URL": {
-                            "Ref": "OriginUrl"
-                        }
-                    }
-                }
-            }
-        },
         "workspacesControl": {
             "Type": "AWS::Serverless::Function",
             "Properties": {
