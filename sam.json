@@ -231,7 +231,7 @@
                                 },
                                 "x-amazon-apigateway-integration": {
                                     "credentials": {
-                                        "Fn::Get": ["approvalStepFunctionsRole", "Arn"]
+                                        "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
                                     },
                                     "responses": {
                                         "default": {
@@ -310,7 +310,7 @@
                                 },
                                 "x-amazon-apigateway-integration": {
                                     "credentials": {
-                                        "Fn::Get": ["approvalStepFunctionsRole", "Arn"]
+                                        "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
                                     },
                                     "responses": {
                                         "default": {
