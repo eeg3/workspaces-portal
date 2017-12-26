@@ -33,7 +33,8 @@
         },
         "ApprovedDomain": {
             "Type": "String",
-            "Description": "Approved email domain that can sign up for Portal access."
+            "Description": "Approved email domain that can sign up for Portal access.",
+            "Default": "eeg3.net"
         }
     },
     "Resources": {
