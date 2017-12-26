@@ -12,33 +12,40 @@ var workspaces = new AWS.WorkSpaces({
     apiVersion: '2015-04-08'
 });
 
+// Create the Step Functions service object
 var stepfunctions = new AWS.StepFunctions();
 
 exports.handler = (event, context, callback) => {
 
-    var originURL = process.env.ORIGIN_URL || '*';
-    var stateMachine = process.env.STATE_MACHINE_ARN || 'arn:aws:states:us-east-1:375301133253:stateMachine:PromotionApproval';
+    var originURL = process.env.ORIGIN_URL || '*'; // Origin URL to allow for CORS
+    var stateMachine = process.env.STATE_MACHINE_ARN || 'arn:aws:states:us-east-1:375301133253:stateMachine:PromotionApproval'; // State Machine for 'create' action.
 
-    console.log('Received event:', JSON.stringify(event, null, 2));
+    console.log('Received event:', JSON.stringify(event, null, 2)); // Output log for debugging purposes.
 
-    var action = JSON.parse(event.body)["action"];
+    // The 'action' parameter specifies what workspaces control should do. Accepted values: list, create, rebuild, reboot, delete.
+    var action = JSON.parse(event.body)["action"]; 
     console.log("action: " + action);
 
     if (action == "list") {
-        console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
+        // 'list' handles outputting the WorkSpace details assigned to the user that submits the API call. 
+        // If no workspace is found, currently just responds with an error which is handled client-side.
+    
+        // The 'email' value within the Cognito token is used to determine ownership, which is checked agaisnt the 'SelfServiceManaged' tag value.
+        // The tag value is used for ownership detection in order to avoid integrating with Directory Services directly.
+        console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email); 
 
         var params = [];
 
+        // Obtain a list of all WorkSpaces, then parse the returned list to find the one with a 'SelfServiceManaged' tag
+        // that equals the email address of the Cognito token, then take the ID of that WorkSpace and return all of its details back.
         workspaces.describeWorkspaces(describeWorkspacesParams, function (err, data) {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
-
-
-                for (var i = 0; i < data.Workspaces.length; i++) {
+                for (var i = 0; i < data.Workspaces.length; i++) { 
                     var workspaceDetails = data[i];
                     var describeTagsParams = {
-                        ResourceId: data.Workspaces[i].WorkspaceId /* required */
+                        ResourceId: data.Workspaces[i].WorkspaceId 
                     };
 
                     workspaces.describeTags(describeTagsParams, function (err, data, workspaceDetails) {
@@ -85,6 +92,11 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "create") {
+        // 'create' handles creation by initiating the Step Functions State Machine. The State Machine first sends an email
+        // to the configured Approver email address with two links: one to approve and one to decline. If the Approver declines, 
+        // the process ends. If the Approver approves, the next State Machine calls another Lambda function 'workspaces-create' that
+        // actually handles creating the WorkSpace.
+
         var stepParams = {
             stateMachineArn: stateMachine, /* required */
             input: JSON.stringify({
@@ -99,7 +111,7 @@ exports.handler = (event, context, callback) => {
             } else {
                 console.log(data);
                 callback(null, {
-                    statusCode: 500,
+                    statusCode: 200,
                     body: JSON.stringify({
                         Result: data,
                     }),
@@ -110,6 +122,10 @@ exports.handler = (event, context, callback) => {
             }
           });
     } else if (action == "rebuild") {
+        // 'rebuild' handles rebuilding the WorkSpace assigned to the user that submits the API call. 
+        // A rebuild function resets the WorkSpace back to its original state. Applications or system settings changes
+        // will be lost during a rebuild. The Data Drive is recreated from the last snapshot; snapshots are taken every 12 hours.
+
         console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
 
         var describeWorkspacesParams = [];
@@ -181,6 +197,8 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "reboot") {
+        // 'rebuild' handles rebooting the WorkSpace assigned to the user that submits the API call. 
+
         console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
 
         var describeWorkspacesParams = [];
@@ -253,6 +271,9 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "delete") {
+        // 'delete' handles deleting the WorkSpace assigned to the user that submits the API call. 
+        // This is a permanent action and cannot be undone. No data will persist after removal.
+
         console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
 
         var describeWorkspacesParams = [];

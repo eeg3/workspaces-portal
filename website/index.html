@@ -20,7 +20,12 @@ layout: default
     <div id="methodStatus" class="alert" role="alert"></div>
   </div>
 </div>
-<div class="row" id="DesktopNoExist">
+<div id="loadDiv" class="row"><!-- Show a loading div before AJAX call, and hide it after. -->
+  <div class="col-sm-12">
+    <img src="/images/ajax_loader_gray_32.gif">
+  </div>
+</div>
+<div class="row" id="desktopNoExist"> <!-- If no provisioned desktop exists for the user, show the request panel. -->
   <div class="col-sm-6 col-sm-offset-3">
 
     <div class="panel panel-primary">
@@ -28,7 +33,7 @@ layout: default
         <h3 class="panel-title">Request WorkSpace</h3>
       </div>
       <div class="panel-body">
-        <form id="RequestWorkSpace">
+        <form id="requestWorkSpace">
           <div>
             <input id="reqUsername" placeholder="User Name" type="text" maxlength="20" value="" required />
           </div>
@@ -76,7 +81,7 @@ layout: default
     </div>
   </div>
 </div>
-<div class="row" id="DesktopExist">
+<div class="row" id="desktopExist"> <!-- If a provisioned desktop does exist for the user, show the control panel for the desktop. -->
   <div class="col-sm-9">
     <div class="panel panel-primary">
       <div class="panel-heading">
@@ -110,21 +115,21 @@ layout: default
         <h3 class="panel-title">WorkSpace Operations</h3>
       </div>
       <div class="panel-body">
-        <form id="RebootWorkSpace" method="post" action="#">
+        <form id="rebootWorkSpace" method="post" action="#">
           <button id="submit" type="submit" name="submit">
             <span>Reboot WorkSpace</span>
             <i></i>
           </button>
         </form>
         <br>
-        <form id="RebuildWorkSpace" method="post" action="#">
+        <form id="rebuildWorkSpace" method="post" action="#">
           <button id="submit" type="submit" name="submit">
             <span>Rebuild WorkSpace</span>
             <i></i>
           </button>
         </form>
         <br>
-        <form id="DecommissionWorkSpace" method="post" action="#">
+        <form id="decommissionWorkSpace" method="post" action="#">
           <button id="submit" type="submit" name="submit">
             <span>Delete WorkSpace</span>
             <i></i>

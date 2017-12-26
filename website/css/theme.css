@@ -17,6 +17,7 @@ body {
   margin: 5px 0;
 }
 
+#loadDiv,
 #RebootWorkSpace,
 #RebuildWorkSpace,
 #DecommissionWorkSpace {
