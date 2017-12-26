@@ -345,6 +345,50 @@ exports.handler = (event, context, callback) => {
             }
         });
 
+    } else if (action == "bundles") {
+        // 'bundles' handles returning the list of WorkSpaces bundles available to use. 
+        // We must make the API call twice to return bundles owned by AMAZON and custom bundles.
+
+        var bundleList = [];
+
+        var bundleParams = {
+            Owner: 'AMAZON'
+          };
+          workspaces.describeWorkspaceBundles(bundleParams, function(err, data) {
+
+            if (err) {
+                console.log("Error: " + err);
+                callback(null, {
+                    statusCode: 500,
+                    body: JSON.stringify({
+                        Error: err,
+                    }),
+                    headers: {
+                        'Access-Control-Allow-Origin': '*',
+                    },
+                });
+            } else {
+
+                for (var i = 0; i < data["Bundles"].length ; i++ ) {
+                    console.log(data["Bundles"][i].Name + " (" + data["Bundles"][i].BundleId + ")");
+                    bundleList.push(data["Bundles"][i].Name + " (" + data["Bundles"][i].BundleId + ")");
+                }
+                
+                callback(null, {
+                    "statusCode": 200,
+                    "body": JSON.stringify({
+                        Result: bundleList
+                    }),
+                    "headers": {
+                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                        "Access-Control-Allow-Origin": originURL
+                    }
+                });
+            }
+
+          });
+
     } else {
         console.log("No action specified.");
         callback(null, {
