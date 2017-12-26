@@ -60,14 +60,6 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                // Log the API call for easier debugging.
-                console.log("URL: " + WORKSPACES_CONTROL_URL);
-                console.log("Token: " + authToken);
-                console.log("json: " + JSON.stringify({
-                    action: 'create',
-                    username: username,
-                    bundle: bundle
-                }));
             },
             complete: function () {},
             data: JSON.stringify({
@@ -102,9 +94,6 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                console.log("json: " + JSON.stringify({
-                    action: 'reboot'
-                }));
             },
             complete: function () {},
             data: JSON.stringify({
@@ -140,9 +129,6 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                console.log("json: " + JSON.stringify({
-                    action: 'rebuild'
-                }));
             },
             complete: function () {},
             data: JSON.stringify({
@@ -166,8 +152,8 @@ var authToken;
 
     }
 
-    // The handleDecommission function does not require any inputs, as it determines the workspace to rebuild by checking for a WorkSpace with
-    // a "SelfServiceManaged" tag set to the email address of the Cognito token; this logic is handled inside the Lambda function.
+    // This function is called to handle the initial click of "Delete WorkSpace", and opens a confirmation modal pop-up. Inside that modal is
+    // another button that calls the actual deletion function.
     function handleDecommission(event) {
         event.preventDefault();
 
@@ -179,6 +165,9 @@ var authToken;
 
     }
 
+    // The handleConfirmDecommission function does not require any inputs, as it determines the workspace to rebuild by checking for a WorkSpace with
+    // a "SelfServiceManaged" tag set to the email address of the Cognito token; this logic is handled inside the Lambda function. This function
+    // is called after the user confirms deletion through the modal pop-up. The modal pop-up is initiated by handleDecommsion().
     function handleConfirmDecommission(event) {
         event.preventDefault();
         $.ajax({
@@ -188,11 +177,6 @@ var authToken;
                 Authorization: authToken
             },
             beforeSend: function () {
-                console.log("URL: " + WORKSPACES_CONTROL_URL);
-                console.log("Token: " + authToken);
-                console.log("json: " + JSON.stringify({
-                    action: 'delete'
-                }));
                 $('#confirmDecommissionModal').modal('hide');
             },
             complete: function () {},
@@ -230,9 +214,6 @@ var authToken;
             },
             beforeSend: function () {
                 $("#loadDiv").show(); // Show a spinning loader to let the user know something is happening.
-                console.log("json: " + JSON.stringify({
-                    action: 'list'
-                }));
             },
             complete: function () {
                 $("#loadDiv").hide(); // Hide the spinning loader once the AJAX call is complete.
@@ -242,7 +223,6 @@ var authToken;
             }),
             contentType: 'text/plain',
             error: function () {
-                $("#desktopNoExist").show(); // If no WorkSpace is returned, show the request panel.
                 $.ajax({
                     method: 'POST',
                     url: WORKSPACES_CONTROL_URL,
@@ -251,9 +231,6 @@ var authToken;
                     },
                     beforeSend: function () {
                         $("#loadDiv").show(); // Show a spinning loader to let the user know something is happening.
-                        console.log("json: " + JSON.stringify({
-                            action: 'bundles'
-                        }));
                     },
                     complete: function () {
                         $("#loadDiv").hide(); // Hide the spinning loader once the AJAX call is complete.
@@ -262,15 +239,20 @@ var authToken;
                         action: 'bundles'
                     }),
                     contentType: 'text/plain',
-                    error: function () {},
+                    error: function () {
+                        $('#reqBundle')
+                            .append($("<option></option>")
+                                .attr("value", "error")
+                                .text("ERROR: No bundles found."));
+                        $("#desktopNoExist").show(); // If no WorkSpace is returned, show the request panel.
+                    },
                     success: function (data) {
-                        console.log("Result is: " + JSON.stringify(data));
                         for (var i = 0; i < data.Result.length; i++) {
-                            console.log(data.Result[i]);
                             $('#reqBundle')
                                 .append($("<option></option>")
                                     .attr("value", data.Result[i].split(':')[0])
                                     .text(data.Result[i].split(':')[1]));
+                            $("#desktopNoExist").show(); // If no WorkSpace is returned, show the request panel.
                         }
                     }
                 });

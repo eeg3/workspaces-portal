@@ -22,7 +22,7 @@ exports.handler = (event, context, callback) => {
 
     console.log('Received event:', JSON.stringify(event, null, 2)); // Output log for debugging purposes.
 
-    // The 'action' parameter specifies what workspaces control should do. Accepted values: list, create, rebuild, reboot, delete.
+    // The 'action' parameter specifies what workspaces control should do. Accepted values: list, create, rebuild, reboot, delete, bundles.
     var action = JSON.parse(event.body)["action"];
     console.log("action: " + action);
 
@@ -402,45 +402,6 @@ exports.handler = (event, context, callback) => {
                 });
             });
         });
-
-
-
-        /*
-        workspaces.describeWorkspaceBundles(bundleParams, function(err, data) {
-
-          if (err) {
-              console.log("Error: " + err);
-              callback(null, {
-                  statusCode: 500,
-                  body: JSON.stringify({
-                      Error: err,
-                  }),
-                  headers: {
-                      'Access-Control-Allow-Origin': '*',
-                  },
-              });
-          } else {
-
-              for (var i = 0; i < data["Bundles"].length ; i++ ) {
-                  console.log(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
-                  bundleList.push(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
-              }
-              
-              callback(null, {
-                  "statusCode": 200,
-                  "body": JSON.stringify({
-                      Result: bundleList
-                  }),
-                  "headers": {
-                      "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                      "Access-Control-Allow-Methods": "GET,OPTIONS",
-                      "Access-Control-Allow-Origin": originURL
-                  }
-              });
-          }
-
-        });
-        */
 
     } else {
         console.log("No action specified.");
