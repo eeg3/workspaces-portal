@@ -18,9 +18,10 @@ body {
 }
 
 #loadDiv,
-#RebootWorkSpace,
-#RebuildWorkSpace,
-#DecommissionWorkSpace {
+#rebootWorkSpace,
+#rebuildWorkSpace,
+#decommissionWorkSpace,
+#confirmDecommissionWorkSpace {
   text-align: center
 }
 

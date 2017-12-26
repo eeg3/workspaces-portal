@@ -24,12 +24,14 @@ var authToken;
     $("#methodStatus").hide();
     $("#desktopNoExist").hide();
     $("#desktopExist").hide();
+    $("#confirmDecommissionModal").hide();
 
     $(function onDocReady() {
 
-        // Hook up functons to forms' submit buttons.
+        // Hook up functions to forms' submit buttons.
         $('#requestWorkSpace').submit(handleRequest);
         $('#decommissionWorkSpace').submit(handleDecommission);
+        $('#confirmDecommissionWorkSpace').submit(handleConfirmDecommission);
         $('#rebootWorkSpace').submit(handleReboot);
         $('#rebuildWorkSpace').submit(handleRebuild);
 
@@ -169,6 +171,16 @@ var authToken;
     function handleDecommission(event) {
         event.preventDefault();
 
+        $('#confirmDecommissionModal').modal({
+            show: true,
+            backdrop: 'static',
+            keyboard: false
+        });
+
+    }
+
+    function handleConfirmDecommission(event) {
+        event.preventDefault();
         $.ajax({
             method: 'POST',
             url: WORKSPACES_CONTROL_URL,
@@ -181,6 +193,7 @@ var authToken;
                 console.log("json: " + JSON.stringify({
                     action: 'delete'
                 }));
+                $('#confirmDecommissionModal').modal('hide');
             },
             complete: function () {},
             data: JSON.stringify({

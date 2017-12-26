@@ -141,6 +141,32 @@ layout: default
 </div>
 
 
+<!-- WorkSpace Deletion Confirmation Modal -->
+<div id="confirmDecommissionModal" class="modal fade" role="dialog">
+  <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">WARNING: Delete WorkSpace</h4>
+      </div>
+      <div class="modal-body">
+        <p>This will <b>permanently</b> delete your WorkSpace. All data will be lost and unrecoverable!</p>
+      </div>
+      <div class="modal-footer">
+        <form id="confirmDecommissionWorkSpace" method="post" action="#">
+          <button id="submit" type="submit" name="submit" class="btn btn-danger">
+            <span>Confirm Delete WorkSpace</span>
+            <i></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div>
+</div>
+
 
 <script src="js/vendor/jquery-3.1.0.js"></script>
 <script src="js/vendor/bootstrap.min.js"></script>
