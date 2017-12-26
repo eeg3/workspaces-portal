@@ -151,3 +151,4 @@ This project is licensed under the [2-Clause BSD License](https://opensource.org
 
 * [AWS Labs: Severless Web Application WorkShop](https://github.com/awslabs/aws-serverless-workshops/tree/master/WebApplication/)
 * [AWS Labs: Serverless SAM Farm](https://github.com/awslabs/aws-serverless-samfarm)
+* [AWS Compute Blog: Implementing Serverless Manual Approval Steps in AWS Step Functions and Amazon API Gateway](https://aws.amazon.com/blogs/compute/implementing-serverless-manual-approval-steps-in-aws-step-functions-and-amazon-api-gateway/)
