@@ -13,7 +13,7 @@ This project leverages the following services:
 * [CloudFormation](https://aws.amazon.com/cloudformation/): Used to deploy the entire stack.
 * [AWS Serverless Application Model](https://aws.amazon.com/about-aws/whats-new/2016/11/introducing-the-aws-serverless-application-model/): Used to provision Lambda/API Gateway.
 * [S3](https://aws.amazon.com/s3/): Used to provide static website hosting and to store our build artifacts.
-* [Lambda](https://aws.amazon.com/lambda/): Used to perform Functions-as-a-Service.
+* [Lambda](https://aws.amazon.com/lambda/): Used to perform Functions-as-a-Service. These can be tested with events in corresponding sample_events/ folder using [lambda-local](https://www.npmjs.com/package/lambda-local).
 * [API Gateway](https://aws.amazon.com/api-gateway/): Used to provide an integration point to our Lambda functions.
 * [Step Functions](https://aws.amazon.com/step-functions/): Used to provide a State Machine for Approval workflows.
 * [Cognito](https://aws.amazon.com/cognito/): Used to provide authentication for our website.
@@ -21,25 +21,9 @@ This project leverages the following services:
 * [CloudWatch Events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html): Used to set a timer event for Lambda functions.
 * [IAM](https://aws.amazon.com/iam/): Provides security controls for our process.
 * [CodePipeline](https://aws.amazon.com/codepipeline/): Used to provide the pipeline functionality for our CI/CD process.
-* [Code Build](https://aws.amazon.com/codebuild/): Used to build the project as part of CodePipeline process.
+* [Code Build](https://aws.amazon.com/codebuild/): Used to build the project as part of CodePipeline process. 
 * [GitHub](http://www.github.com): Used as the source code repository. Could theoretically be replaced with CodeCommit.
-* [Jekyll](http://www.jekyllrb.com): Provides static web site generation.
-
-### Website
-
-The code for the website are placed within the website/ folder. [Jekyll](https://jekyllrb.com/) is used for static site generation. The site will be built through Code Build as part of the process. It can also be viewed locally through `jekyll serve` within the website directory.
-
-### Lambda
-
-Lambda functions are located within the lambda/ folder. These can be tested with the events within the corresponding sample_events/ folder using [lambda-local](https://www.npmjs.com/package/lambda-local).
-
-### Pipeline
-
-The code for the pipeline resides within the root.
-
-1. **deploy.json**: Launcher for the core services within CloudFormation (S3, CodePipeline, CodeBuild, Cognito). These are not modified by the pipeline on changes, but it does include setting up the pipeline itself. This is the CloudFormation template to launch to get setup started.
-2. **buildspec.yml**: This file is used by CodeBuild to tell it what to do on every build.
-3. **sam.json**: CloudFormation Serverless Transformation template for SAM. This template handles creation of the Lambda functions, Step Functions, and the approval API Gateway.
+* [Jekyll](http://www.jekyllrb.com): Provides static web site generation to convert the `website/` directory.
 
 ## Deployment
 
@@ -122,6 +106,12 @@ The user should receive an email with instructions on how to use their WorkSpace
 ## Updating
 
 As the website or serverless function is updated, simply perform the modifications within the code and then push them to the GitHub repo. Once checked in to GitHub, CodePipeline will handle the rest automatically. To test this functionality, browse to the CodePipeline page and view the pipeline while pushing a change. The pipeline will show the process from Source -> Build -> Deploy. If there are any failures, they will be visible within the pipeline.
+
+The code for the pipeline resides within the root of the project, and the pipeline itself exists as part of the parent CloudFormation stack.
+
+1. **deploy.json**: Launcher for the core services within CloudFormation (S3, CodePipeline, CodeBuild, Cognito). These are not modified by the pipeline on changes, but it does include setting up the pipeline itself. This is the CloudFormation template to launch to get setup started.
+2. **buildspec.yml**: This file is used by CodeBuild to tell it what to do on every build.
+3. **sam.json**: CloudFormation Serverless Transformation template for SAM. This template handles creation of the Lambda functions, Step Functions, and the approval API Gateway.
 
 ## Notes
 
