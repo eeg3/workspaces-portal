@@ -6,6 +6,25 @@ The WorkSpaces Portal provides Self-Service capability to end-users for Amazon W
 
 ![Architectural Diagram](docs/Portal_Architecture_Diagram.png)
 
+### Components Overview
+
+This project leverages the following services:
+
+* [CloudFormation](https://aws.amazon.com/cloudformation/): Used to deploy the entire stack.
+* [AWS Serverless Application Model](https://aws.amazon.com/about-aws/whats-new/2016/11/introducing-the-aws-serverless-application-model/): Used to provision Lambda/API Gateway.
+* [S3](https://aws.amazon.com/s3/): Used to provide static website hosting and to store our build artifacts.
+* [Lambda](https://aws.amazon.com/lambda/): Used to perform Functions-as-a-Service.
+* [API Gateway](https://aws.amazon.com/api-gateway/): Used to provide an integration point to our Lambda functions.
+* [Step Functions](https://aws.amazon.com/step-functions/): Used to provide a State Machine for Approval workflows.
+* [Cognito](https://aws.amazon.com/cognito/): Used to provide authentication for our website.
+* [SES](https://aws.amazon.com/ses/): Used to send Approval emails.
+* [CloudWatch Events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html): Used to set a timer event for Lambda functions.
+* [IAM](https://aws.amazon.com/iam/): Provides security controls for our process.
+* [CodePipeline](https://aws.amazon.com/codepipeline/): Used to provide the pipeline functionality for our CI/CD process.
+* [Code Build](https://aws.amazon.com/codebuild/): Used to build the project as part of CodePipeline process.
+* [GitHub](http://www.github.com): Used as the source code repository. Could theoretically be replaced with CodeCommit.
+* [Jekyll](http://www.jekyllrb.com): Provides static web site generation.
+
 ### Website
 
 The code for the website are placed within the website/ folder. [Jekyll](https://jekyllrb.com/) is used for static site generation. The site will be built through Code Build as part of the process. It can also be viewed locally through `jekyll serve` within the website directory.
@@ -22,14 +41,14 @@ The code for the pipeline resides within the root.
 2. **buildspec.yml**: This file is used by CodeBuild to tell it what to do on every build.
 3. **sam.json**: CloudFormation Serverless Transformation template for SAM. This template handles creation of the Lambda functions, Step Functions, and the approval API Gateway.
 
-## Prerequisites
+## Deployment
+
+### Prerequisites
 
 What things you need to install the software and how to install them
 
 1. The AWS account must be setup for SES for production usage. By default, SES is locked down, and needs to be [moved out of the Amazon SES Sandbox](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/request-production-access.html).
 2. Amazon WorkSpaces at the most basic level should be setup. This includes setting up a Directory Services directory (any type is fine). 
-
-## Deployment
 
 ### CloudFormation
 
