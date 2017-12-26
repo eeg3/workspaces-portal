@@ -243,6 +243,37 @@ var authToken;
             contentType: 'text/plain',
             error: function () {
                 $("#desktopNoExist").show(); // If no WorkSpace is returned, show the request panel.
+                $.ajax({
+                    method: 'POST',
+                    url: WORKSPACES_CONTROL_URL,
+                    headers: {
+                        Authorization: authToken
+                    },
+                    beforeSend: function () {
+                        $("#loadDiv").show(); // Show a spinning loader to let the user know something is happening.
+                        console.log("json: " + JSON.stringify({
+                            action: 'bundles'
+                        }));
+                    },
+                    complete: function () {
+                        $("#loadDiv").hide(); // Hide the spinning loader once the AJAX call is complete.
+                    },
+                    data: JSON.stringify({
+                        action: 'bundles'
+                    }),
+                    contentType: 'text/plain',
+                    error: function () {},
+                    success: function (data) {
+                        console.log("Result is: " + JSON.stringify(data));
+                        for (var i = 0; i < data.Result.length; i++) {
+                            console.log(data.Result[i]);
+                            $('#reqBundle')
+                                .append($("<option></option>")
+                                    .attr("value", data.Result[i].split(':')[0])
+                                    .text(data.Result[i].split(':')[1]));
+                        }
+                    }
+                });
             },
             success: function (data) {
                 // If a WorkSpace is returned, populate the table with its details (ID, Username, State, and Bundle ID).

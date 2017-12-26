@@ -23,16 +23,16 @@ exports.handler = (event, context, callback) => {
     console.log('Received event:', JSON.stringify(event, null, 2)); // Output log for debugging purposes.
 
     // The 'action' parameter specifies what workspaces control should do. Accepted values: list, create, rebuild, reboot, delete.
-    var action = JSON.parse(event.body)["action"]; 
+    var action = JSON.parse(event.body)["action"];
     console.log("action: " + action);
 
     if (action == "list") {
         // 'list' handles outputting the WorkSpace details assigned to the user that submits the API call. 
         // If no workspace is found, currently just responds with an error which is handled client-side.
-    
+
         // The 'email' value within the Cognito token is used to determine ownership, which is checked agaisnt the 'SelfServiceManaged' tag value.
         // The tag value is used for ownership detection in order to avoid integrating with Directory Services directly.
-        console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email); 
+        console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
 
         var params = [];
 
@@ -42,10 +42,10 @@ exports.handler = (event, context, callback) => {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
-                for (var i = 0; i < data.Workspaces.length; i++) { 
+                for (var i = 0; i < data.Workspaces.length; i++) {
                     var workspaceDetails = data[i];
                     var describeTagsParams = {
-                        ResourceId: data.Workspaces[i].WorkspaceId 
+                        ResourceId: data.Workspaces[i].WorkspaceId
                     };
 
                     workspaces.describeTags(describeTagsParams, function (err, data, workspaceDetails) {
@@ -62,10 +62,10 @@ exports.handler = (event, context, callback) => {
                                         WorkspaceIds: [
                                             describeTagsParams.ResourceId
                                         ]
-                                      };
-                                      workspaces.describeWorkspaces(describeDetailsParams, function(err, data) {
+                                    };
+                                    workspaces.describeWorkspaces(describeDetailsParams, function (err, data) {
 
-                                        if(err) {
+                                        if (err) {
                                             console.log(err, err.stack);
                                         } else {
                                             console.log("Finally: " + data);
@@ -79,7 +79,7 @@ exports.handler = (event, context, callback) => {
                                                 }
                                             });
                                         }
-                                      });
+                                    });
 
                                 }
                             }
@@ -98,14 +98,15 @@ exports.handler = (event, context, callback) => {
         // actually handles creating the WorkSpace.
 
         var stepParams = {
-            stateMachineArn: stateMachine, /* required */
+            stateMachineArn: stateMachine,
+            /* required */
             input: JSON.stringify({
                 "requesterEmailAddress": event.requestContext.authorizer.claims.email,
                 "requesterUsername": JSON.parse(event.body)["username"],
                 "requesterBundle": JSON.parse(event.body)["bundle"]
             })
-          };
-          stepfunctions.startExecution(stepParams, function(err, data) {
+        };
+        stepfunctions.startExecution(stepParams, function (err, data) {
             if (err) {
                 console.log(err, err.stack);
             } else {
@@ -120,7 +121,7 @@ exports.handler = (event, context, callback) => {
                     },
                 });
             }
-          });
+        });
     } else if (action == "rebuild") {
         // 'rebuild' handles rebuilding the WorkSpace assigned to the user that submits the API call. 
         // A rebuild function resets the WorkSpace back to its original state. Applications or system settings changes
@@ -171,7 +172,7 @@ exports.handler = (event, context, callback) => {
                                             });
                                         } else {
                                             console.log("Result: " + JSON.stringify(data));
-                                            
+
                                             callback(null, {
                                                 "statusCode": 200,
                                                 "body": JSON.stringify({
@@ -245,7 +246,7 @@ exports.handler = (event, context, callback) => {
                                             });
                                         } else {
                                             console.log("Result: " + JSON.stringify(data));
-                                            
+
                                             callback(null, {
                                                 "statusCode": 200,
                                                 "body": JSON.stringify({
@@ -320,7 +321,7 @@ exports.handler = (event, context, callback) => {
                                             });
                                         } else {
                                             console.log("Result: " + JSON.stringify(data));
-                                            
+
                                             callback(null, {
                                                 "statusCode": 200,
                                                 "body": JSON.stringify({
@@ -346,34 +347,48 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "bundles") {
-        // 'bundles' handles returning the list of WorkSpaces bundles available to use. 
+        // 'bundles' handles returning the list of WorkSpaces bundles available to use. The WorkSpaces API only returns a page at a time, so we must recursively 
+        // make the call to describeWorkspaceBundles until NextToken is null.
         // We must make the API call twice to return bundles owned by AMAZON and custom bundles.
 
         var bundleList = [];
 
-        var bundleParams = {
-            Owner: 'AMAZON'
-          };
-          workspaces.describeWorkspaceBundles(bundleParams, function(err, data) {
+        function getBundles(parameters, cb) {
+            workspaces.describeWorkspaceBundles(parameters, function (err, data) {
+                if (err) {
+                    callback(null, {
+                        statusCode: 500,
+                        body: JSON.stringify({
+                            Error: err,
+                        }),
+                        headers: {
+                            'Access-Control-Allow-Origin': '*',
+                        },
+                    });
+                } else {
+                    for (var i = 0; i < data["Bundles"].length; i++) {
+                        console.log(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
+                        bundleList.push(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
+                    }
+                    console.log("NextToken: " + data["NextToken"]);
 
-            if (err) {
-                console.log("Error: " + err);
-                callback(null, {
-                    statusCode: 500,
-                    body: JSON.stringify({
-                        Error: err,
-                    }),
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                });
-            } else {
-
-                for (var i = 0; i < data["Bundles"].length ; i++ ) {
-                    console.log(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
-                    bundleList.push(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
+                    if (data.NextToken) {
+                        parameters.NextToken = data["NextToken"];
+                        getBundles(parameters, cb);
+                    } else {
+                        cb();
+                    }
                 }
-                
+            });
+        }
+
+        // Get the Amazon-owned bundle list first, and then get the Customer-owned bundles next, and then return the entire list.
+        getBundles({
+            Owner: 'AMAZON'
+        }, function () {
+            getBundles({
+                Owner: null
+            }, function () {
                 callback(null, {
                     "statusCode": 200,
                     "body": JSON.stringify({
@@ -385,9 +400,47 @@ exports.handler = (event, context, callback) => {
                         "Access-Control-Allow-Origin": originURL
                     }
                 });
-            }
+            });
+        });
 
-          });
+
+
+        /*
+        workspaces.describeWorkspaceBundles(bundleParams, function(err, data) {
+
+          if (err) {
+              console.log("Error: " + err);
+              callback(null, {
+                  statusCode: 500,
+                  body: JSON.stringify({
+                      Error: err,
+                  }),
+                  headers: {
+                      'Access-Control-Allow-Origin': '*',
+                  },
+              });
+          } else {
+
+              for (var i = 0; i < data["Bundles"].length ; i++ ) {
+                  console.log(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
+                  bundleList.push(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
+              }
+              
+              callback(null, {
+                  "statusCode": 200,
+                  "body": JSON.stringify({
+                      Result: bundleList
+                  }),
+                  "headers": {
+                      "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                      "Access-Control-Allow-Methods": "GET,OPTIONS",
+                      "Access-Control-Allow-Origin": originURL
+                  }
+              });
+          }
+
+        });
+        */
 
     } else {
         console.log("No action specified.");
