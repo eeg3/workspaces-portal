@@ -20,10 +20,25 @@ This project leverages the following services:
 * [SES](https://aws.amazon.com/ses/): Used to send Approval emails.
 * [CloudWatch Events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html): Used to set a timer event for Lambda functions.
 * [IAM](https://aws.amazon.com/iam/): Provides security controls for our process.
+* [CloudFront](https://aws.amazon.com/cloudfront/): Provides HTTPS in front of S3 web site.
 * [CodePipeline](https://aws.amazon.com/codepipeline/): Used to provide the pipeline functionality for our CI/CD process.
 * [Code Build](https://aws.amazon.com/codebuild/): Used to build the project as part of CodePipeline process. 
 * [GitHub](http://www.github.com): Used as the source code repository. Could theoretically be replaced with CodeCommit.
 * [Jekyll](http://www.jekyllrb.com): Provides static web site generation to convert the `website/` directory.
+
+## Usage
+
+### User Account Creation
+
+Placeholder.
+
+### Creating a WorkSpace
+
+Placeholder.
+
+### Managing a WorkSpace
+
+Placeholder.
 
 ## Deployment
 
@@ -94,6 +109,10 @@ Once the `config.js` file is updated, push the change to the GitHub repo; this w
 *Warning: If this is not configured, anyone can sign up and use the portal.*
 
 Also needed after deployment is to configure Cognito -> User Pools -> <Created Pool> -> General Settings -> Triggers -> Custom Message Trigger to point to the `cogDomainVerify` Lambda function. This will enable limiting signups to the email domain configured in the function.
+
+#### Create CloudFront Web Distribution to provide HTTPS Support
+
+Placeholder.
 
 ### Testing
 
