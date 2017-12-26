@@ -370,8 +370,8 @@ exports.handler = (event, context, callback) => {
             } else {
 
                 for (var i = 0; i < data["Bundles"].length ; i++ ) {
-                    console.log(data["Bundles"][i].Name + " (" + data["Bundles"][i].BundleId + ")");
-                    bundleList.push(data["Bundles"][i].Name + " (" + data["Bundles"][i].BundleId + ")");
+                    console.log(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
+                    bundleList.push(data["Bundles"][i].BundleId + ":" + data["Bundles"][i].Name);
                 }
                 
                 callback(null, {
