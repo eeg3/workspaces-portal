@@ -111,7 +111,7 @@ Once the `config.js` file is updated, push the change to the GitHub repo; this w
 
 Also needed after deployment is to configure Cognito -> User Pools -> <Created Pool> -> General Settings -> Triggers -> Custom Message Trigger to point to the `cogDomainVerify` Lambda function. This will enable limiting signups to the email domain configured in the function.
 
-#### Testing
+### Testing
 
 The site should now work as expected. Browse to the URL defined within `OriginURL`, and select "Register" from the top right drop-down. Enter an email address (within the configured domain inside cogDomainVerify) and password, and select Register. You will receive a verification code from Cognito. Once received, select "Verify" from the top right drop-down; on the verify page, enter your email and verification code provided.
 
@@ -119,30 +119,11 @@ On the main page, the ability to request a WorkSpace should now be displayed. Re
 
 The user should receive an email with instructions on how to use their WorkSpace once it finishes provisioning. The user can also log back into the WorkSpaces Portal to try rebooting, rebuilding, or deleting the WorkSpace.
 
-### Updating the Portal
+## Updating
 
 As the website or serverless function is updated, simply perform the modifications within the code and then push them to the GitHub repo. Once checked in to GitHub, CodePipeline will handle the rest automatically. To test this functionality, browse to the CodePipeline page and view the pipeline while pushing a change. The pipeline will show the process from Source -> Build -> Deploy. If there are any failures, they will be visible within the pipeline.
 
-## Built With
-
-This project leverages the following services:
-
-* [CloudFormation](https://aws.amazon.com/cloudformation/): Used to deploy the entire stack.
-* [AWS Serverless Application Model](https://aws.amazon.com/about-aws/whats-new/2016/11/introducing-the-aws-serverless-application-model/): Used to provision Lambda/API Gateway.
-* [S3](https://aws.amazon.com/s3/): Used to provide static website hosting and to store our build artifacts.
-* [Lambda](https://aws.amazon.com/lambda/): Used to perform Functions-as-a-Service.
-* [API Gateway](https://aws.amazon.com/api-gateway/): Used to provide an integration point to our Lambda functions.
-* [Step Functions](https://aws.amazon.com/step-functions/): Used to provide a State Machine for Approval workflows.
-* [Cognito](https://aws.amazon.com/cognito/): Used to provide authentication for our website.
-* [SES](https://aws.amazon.com/ses/): Used to send Approval emails.
-* [CloudWatch Events](https://docs.aws.amazon.com/AmazonCloudWatch/latest/events/WhatIsCloudWatchEvents.html): Used to set a timer event for Lambda functions.
-* [IAM](https://aws.amazon.com/iam/): Provides security controls for our process.
-* [CodePipeline](https://aws.amazon.com/codepipeline/): Used to provide the pipeline functionality for our CI/CD process.
-* [Code Build](https://aws.amazon.com/codebuild/): Used to build the project as part of CodePipeline process.
-* [GitHub](http://www.github.com): Used as the source code repository. Could theoretically be replaced with CodeCommit.
-* [Jekyll](http://www.jekyllrb.com): Provides static web site generation.
-
-### Notes
+## Notes
 
 1. If you want to delete the stack, make sure to delete the pipeline-created stack first and then delete the parent stack. If you delete the parent first, the IAM role is deleted and you'll have to tinker around with permissions to get the stack to actually gracefully delete.
 2. Some of the IAM permissions may be more liberal than preferred. Please review and edit to match to your security policies as appropriate.
