@@ -51,9 +51,9 @@ exports.handler = (event, context, callback) => {
                                 Data: 'Hi!<br />' +
                                     input.requesterEmailAddress + ' has requested a WorkSpace!<br />' +
                                     'Can you please approve:<br />' +
-                                    'https://' + process.env.API_DEPLOYMENT_ID + '.execute-api.us-east-1.amazonaws.com/respond/succeed?taskToken=' + encodeURIComponent(data.taskToken) + '&requesterEmailAddress=' + input.requesterEmailAddress + '&requesterUsername=' + input.requesterUsername + '&requesterBundle=' + input.requesterBundle + '<br />' +
+                                    'https://' + process.env.API_DEPLOYMENT_ID + '.execute-api.' + process.env.AWS_REGION + '.amazonaws.com/respond/succeed?taskToken=' + encodeURIComponent(data.taskToken) + '&requesterEmailAddress=' + input.requesterEmailAddress + '&requesterUsername=' + input.requesterUsername + '&requesterBundle=' + input.requesterBundle + '<br />' +
                                     'Or reject:<br />' +
-                                    'https://' + process.env.API_DEPLOYMENT_ID + '.execute-api.us-east-1.amazonaws.com/respond/fail?taskToken=' + encodeURIComponent(data.taskToken),
+                                    'https://' + process.env.API_DEPLOYMENT_ID + '.execute-api.' + process.env.AWS_REGION + '.amazonaws.com/respond/fail?taskToken=' + encodeURIComponent(data.taskToken),
                                 Charset: 'UTF-8'
                             }
                         }

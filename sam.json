@@ -235,7 +235,9 @@
                                             "statusCode": "200"
                                         }
                                     },
-                                    "uri": "arn:aws:apigateway:us-east-1:states:action/SendTaskFailure",
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:states:action/SendTaskFailure"
+                                    },
                                     "passthroughBehavior": "when_no_templates",
                                     "httpMethod": "POST",
                                     "requestTemplates": {
@@ -314,7 +316,9 @@
                                             "statusCode": "200"
                                         }
                                     },
-                                    "uri": "arn:aws:apigateway:us-east-1:states:action/SendTaskSuccess",
+                                    "uri": {
+                                        "Fn::Sub": "arn:aws:apigateway:${AWS::Region}:states:action/SendTaskSuccess"
+                                    },
                                     "passthroughBehavior": "when_no_templates",
                                     "httpMethod": "POST",
                                     "requestTemplates": {
