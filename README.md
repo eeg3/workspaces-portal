@@ -155,6 +155,16 @@ Also needed after deployment is to configure Cognito to use the cognito-domainVe
 
 This will enable limiting signups to the email domain configured in the function.
 
+#### Configure App Settings
+
+Edit `sam.json` to update the settings specific to your environment. Simple change the `Default` value under `Parameters`.
+
+1. *AppName*: This name will be used within the application components.
+2. *PortalEmail*: This is the email address that approval emails will be sent from.
+3. *ApproverEmail*: This is the email or distribution list that will receive the Approval email messages to approve or reject.
+4. *DirectoryServicesId*: This is the Directory Services ID configured within Amazon WorkSpaces.
+5. *ApprovedDomain*: This is the domain that can sign up for the portal (e.g. @company.com).
+
 #### Push Changes
 
 Once the `config.js` file is updated, push the change to the GitHub repo; this will automatically update the application with the new config through the pipeline.
@@ -170,6 +180,16 @@ The site should now work as expected. Browse to the URL defined within `OriginUR
 On the main page, the ability to request a WorkSpace should now be displayed. Request a WorkSpace with a user (that must exist within the Directory) and select a Bundle ID to use. It should begin the approval process, and the email address configured for approvals should receive an Approval Request email within 10 minutes, which is within time for the CloudWatch Event that triggers the Lambda function polling Step Functions to run (this can be configured lower within `sam.json` for the Lambda function if desired. Approve the request, and the creation process should begin.
 
 The user should receive an email with instructions on how to use their WorkSpace once it finishes provisioning. The user can also log back into the WorkSpaces Portal to try rebooting, rebuilding, or deleting the WorkSpace.
+
+## Removal
+
+1. CloudFormation -> Delete Child Stack (e.g. appname-serverless-stack).
+2. CloudFormation -> Delete Parent Stack (e.g. appname)
+3. Delete all WorkSpaces created (if desired).
+4. Delete the Directory Services directory (if desired).
+5. Delete the `workspaces-portal` API Gateway.
+6. Delete the created S3 Buckets (e.g. AppName-Bucket & serverless-app-<ACCOUNTID>-<REGION>-AppName).
+7. Delete the CloudFront Web Distribution.
 
 ## Updating
 
