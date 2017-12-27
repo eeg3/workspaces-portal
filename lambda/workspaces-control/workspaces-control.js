@@ -2,10 +2,6 @@
 
 // Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
-// Set the region 
-AWS.config.update({
-    region: 'us-east-1'
-});
 
 // Create the WorkSpaces service object
 var workspaces = new AWS.WorkSpaces({
