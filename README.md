@@ -81,7 +81,7 @@ Once deployed, the application still requires some additional configuration to w
 
 ### Configuration
 
-After initial deployment, the site will not be fully functional as a few configuration steps must occur.
+After initial deployment, the site will not be fully functional as a few configuration steps must occur. Before proceeding, let CodePipeline perform an initial deployment of the child stack. This is needed to be able to select the Lambda functions created within the API Gateway created in the next step. As soon as the child stack appears within the CloudFormation Stacks list, configuration steps below can begin.
 
 #### Manually Create API Gateway
 
@@ -115,7 +115,7 @@ In the meantime, the API Gateway is built manually. To create the API Gateway ma
 24. Select `Resources` on the left pane under the API.
 25. Select `POST` under the `workspaces-control` resource.
 26. Select `Method Request`.
-27. Select the pencil next to `Authorization` and then select the Authorizer previously created manually (e.g. portal_cognito), and select the checkmark.
+27. Select the pencil next to `Authorization` and then select the Authorizer previously created manually (e.g. portal_cognito), and select the checkmark. This may require refreshing the page if only only `AWS_IAM` appears.
 28. Select `Action` dropdown -> `Deploy API`.
 29. Under `Deployment Stage`, select `[New Stage]`.
 30. Under `Stage name`, enter `Prod`.
@@ -138,7 +138,7 @@ The `UserPoolClientId` and `UserPoolId` should be placed into the `website/js/co
 
 #### Configure Approval Email Address
 
-For WorkSpace creation approvals, configure the email address within the `approval.email` entry. This could be an individual address or a Distribution List.
+For WorkSpace creation approvals, configure the email address within the `approval.email` entry inside `website/js/confi.js`. This could be an individual address or a Distribution List.
 
 #### Configure Cognito to use Custom Trigger
 
@@ -157,13 +157,13 @@ This will enable limiting signups to the email domain configured in the function
 
 #### Configure App Settings
 
-Edit `sam.json` to update the settings specific to your environment. Simple change the `Default` value under `Parameters`.
+Edit `sam.json` to update the settings specific to your environment. Simply change the `Default` values under the `Parameters` section.
 
-1. *AppName*: This name will be used within the application components.
-2. *PortalEmail*: This is the email address that approval emails will be sent from.
-3. *ApproverEmail*: This is the email or distribution list that will receive the Approval email messages to approve or reject.
-4. *DirectoryServicesId*: This is the Directory Services ID configured within Amazon WorkSpaces.
-5. *ApprovedDomain*: This is the domain that can sign up for the portal (e.g. @company.com).
+1. **AppName**: This name will be used within the application components.
+2. **PortalEmail**: This is the email address that approval emails will be sent from.
+3. **ApproverEmail**: This is the email or distribution list that will receive the Approval email messages to approve or reject.
+4. **DirectoryServicesId**: This is the Directory Services ID configured within Amazon WorkSpaces.
+5. **ApprovedDomain**: This is the domain that can sign up for the portal (e.g. @company.com).
 
 #### Push Changes
 
