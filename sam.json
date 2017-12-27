@@ -125,6 +125,45 @@
                 }
             }
         },
+        "approvalStepFunctionsRolePolicy": {
+            "Type": "AWS::IAM:Policy",
+            "DependsOn": "approvalStepFunctionsRole",
+            "Description": "Step Functions IAM Policy",
+            "Properties": {
+                "PolicyName": "approvalStepFunctionsPolicy",
+                "PolicyDocument": {
+                    "Statement:": [{
+                        "Effect": "Allow",
+                        "Action": "lambda:InvokeFunction",
+                        "Resource": [{
+                            "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                        }]
+                    }, {
+                        "Effect": "Allow",
+                        "Action": [
+                            "logs:CreateLogGroup",
+                            "logs:CreateLogStream",
+                            "logs:DescribeLogGroups",
+                            "logs:DescribeLogStreams",
+                            "logs:PutLogEvents",
+                            "logs:GetLogEvents",
+                            "logs:FilterLogEvents",
+                        ],
+                        "Resource": "*"
+                    },{
+                        "Effect": "Allow",
+                        "Action": [
+                            "states:*"
+                        ],
+                        "Resource": "*"
+                    }]
+                    },
+                    "Roles": [{
+                        "Ref": "approvalStepFunctionsRole"
+                    }]
+                }
+            }
+        },
         "approvalStepFunctionsRole": {
             "Description": "Creating service role in IAM for Step Functions",
             "Type": "AWS::IAM::Role",
@@ -143,32 +182,7 @@
                         "Action": "sts:AssumeRole"
                     }]
                 },
-                "Path": "/",
-                "Policies": [{
-                    "PolicyName": "workspaceCreateInvoke",
-                    "PolicyDocument": {
-                        "Statement": [{
-                            "Effect": "Allow",
-                            "Action": "lambda:InvokeFunction",
-                            "Resource": [{
-                                "Fn::GetAtt": ["workspacesCreate", "Arn"]
-                            }]
-                        }, {
-                            "Effect": "Allow",
-                            "Action": [
-                                "logs:CreateLogGroup",
-                                "logs:CreateLogStream",
-                                "logs:DescribeLogGroups",
-                                "logs:DescribeLogStreams",
-                                "logs:PutLogEvents",
-                                "logs:GetLogEvents",
-                                "logs:FilterLogEvents",
-                                "states:*"
-                            ],
-                            "Resource": "*"
-                        }]
-                    }
-                }]
+                "Path": "/"
             }
         },
         "approvalManualActivity": {
