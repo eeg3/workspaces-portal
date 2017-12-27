@@ -14,7 +14,7 @@
             "MaxLength": "80",
             "AllowedPattern": "[A-Za-z0-9-]+",
             "ConstraintDescription": "Malformed input parameter. AppName must only contain upper and lower case letters, numbers, and -.",
-            "Default": "wsPortal"
+            "Default": "wsPortest"
         },
         "PortalEmail": {
             "Type": "String",
@@ -130,7 +130,7 @@
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "RoleName": {
-                    "Fn::Sub": "${AppName}-role"
+                    "Fn::Sub": "${AppName}-${AWS::Region}-role"
                 },
                 "AssumeRolePolicyDocument": {
                     "Statement": [{

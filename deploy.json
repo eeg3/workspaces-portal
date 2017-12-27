@@ -32,7 +32,7 @@
         },
         "CodeBuildImage": {
             "Type": "String",
-            "Default": "aws/codebuild/nodejs:7.0.0",
+            "Default": "node:latest",
             "Description": "Image used for CodeBuild project."
         },
         "GitHubRepoName": {

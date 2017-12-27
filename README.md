@@ -47,7 +47,7 @@ Placeholder.
 What things you need to install the software and how to install them
 
 1. The AWS account must be setup for SES for production usage. By default, SES is locked down, and needs to be [moved out of the Amazon SES Sandbox](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/request-production-access.html).
-2. Amazon WorkSpaces at the most basic level should be setup. This includes setting up a Directory Services directory (any type is fine). 
+2. Amazon WorkSpaces at the most basic level should be setup. This includes setting up a Directory Services directory and registering it for WorkSpaces. 
 
 ### CloudFormation
 
