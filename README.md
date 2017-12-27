@@ -49,6 +49,13 @@ What things you need to install the software and how to install them
 1. The AWS account must be setup for SES for production usage. By default, SES is locked down, and needs to be [moved out of the Amazon SES Sandbox](https://docs.aws.amazon.com/ses/latest/DeveloperGuide/request-production-access.html).
 2. Amazon WorkSpaces at the most basic level should be setup. This includes setting up a Directory Services directory and registering it for WorkSpaces. 
 
+### GitHub Creation
+
+1. Create a GitHub repository that mirrors the project repository.
+2. If the repository is private, navigate to https://github.com/settings/tokens/new to generate a new Personal Access Token for the pipeline to use.
+3. Give the token an appropriate name, and select: `repo` and `admin:repo_hook`.
+4. Save the Personal Access Token as it will be entered into the CloudFormation deployment.
+
 ### CloudFormation
 
 Deploying the application starts by running the `deploy.json` file inside CloudFormation. The `deploy.json` template will ask for the following parameters:
@@ -64,6 +71,7 @@ Deploying the application starts by running the `deploy.json` file inside CloudF
 9. **GitHubUser**: GitHub Username.
 10. **GitHubToken**: GitHub token to use for authentication to the GitHub account. Configurable inside Github: https://github.com/settings/tokens. Token needs `repo_hook` permissions.
 
+The CloudFormation deployment will notify that it will create IAM Permissions; check the box acknowledging the permissions creation to proceed.
 
 The files referenced (e.g. SAMInputFile) are expected to exist within the GitHub repository. The CloudFormation deployment will warn that it is creating IAM permissions; this is because it creates roles and policies for the pipeline to use when it creates/modifies the child stack.
 
@@ -81,9 +89,39 @@ The Serverless Application Model (SAM) within AWS / CloudFormation does not supp
 
 In the meantime, the API Gateway is built manually. To create the API Gateway manually, follow these steps:
 
-1. Go to API Gateway 
-2. Placeholder
-3. Placeholder
+1. Navigate to API Gateway within the AWS Console
+2. Select `Create API`
+3. Select `New API`
+4. Enter an API Name (e.g. workspaces-portal)
+5. Select `Create API`
+6. Select `Actions` dropdown -> `Create Resource`
+7. Enter `workspaces-control` as the Resource name.
+8. Check `Enable API Gateway CORS`
+9. Select `Create Resource`
+10. Select `Actions` dropdown -> `Create Method`
+11. From the dropdown under the resource, choose `POST` then select the checkmark.
+12. Check `Use Lambda Proxy Integration`
+13. Choose the region the environment is deployed within from the dropdown.
+14. Select the workspacesControl Lambda that has previously been created by CloudFormation (e.g. appName-serverless-stack-workspacesControl-ABCDEFGH).
+15. Select `Save`
+16. When the `Add Permissions` pop-up opens, select `OK`.
+17. Select `Authorizers` on the left pane under the API.
+18. Select `Create New Authorizer`.
+19. Enter a name for the Authorizer (e.g. portal_cognito).
+20. Under `Type` select Cognito.
+21. Select the pool created by CloudFormation (e.g. appName-pool).
+22. Under `Token Source`, enter `Authorization`.
+23. Select `Create`.
+24. Select `Resources` on the left pane under the API.
+25. Select `POST` under the `workspaces-control` resource.
+26. Select `Method Request`.
+27. Select the pencil next to `Authorization` and then select the Authorizer previously created manually (e.g. portal_cognito), and select the checkmark.
+28. Select `Action` dropdown -> `Deploy API`.
+29. Under `Deployment Stage`, select `[New Stage]`.
+30. Under `Stage name`, enter `Prod`.
+31. Select `Deploy`.
+32. Copy the `Invoke URL` (e.g. https://abcdefgh.execute-api.us-west-2.amazonaws.com/Prod).
+33. Paste the `Invoke URL` into `website/js/config.js` within `api.invokeUrl`.
 
 #### Update Web Config with Infrastructure Details
 
@@ -98,17 +136,28 @@ Within the parent Stack, the Outputs tab should display the following items:
 
 The `UserPoolClientId` and `UserPoolId` should be placed into the `website/js/config.js` file within the `cognito.userPoolId` and `cognito.userPoolClientId` so that the website knows how to use the services provisioned. If not using `us-east-1`, also change the region within `cognito.region` accordingly.
 
-The API Gateway created manually should also be placed into `website/js/config.js` within the `api.invokeUrl` entry.
+#### Configure Approval Email Address
 
-For WorkSpace creation approvals, configure the email address within the `approval.email` entry.
-
-Once the `config.js` file is updated, push the change to the GitHub repo; this will automatically update the application with the new config through the pipeline.
+For WorkSpace creation approvals, configure the email address within the `approval.email` entry. This could be an individual address or a Distribution List.
 
 #### Configure Cognito to use Custom Trigger
 
 *Warning: If this is not configured, anyone can sign up and use the portal.*
 
-Also needed after deployment is to configure Cognito -> User Pools -> <Created Pool> -> General Settings -> Triggers -> Custom Message Trigger to point to the `cogDomainVerify` Lambda function. This will enable limiting signups to the email domain configured in the function.
+Also needed after deployment is to configure Cognito to use the cognito-domainVerify Lambda. To configure manually, follow these steps:
+
+1. Navigate to Cognito within the AWS Console.
+2. Select `Manage your User Pools`.
+3. Select the pool created by CloudFormation (e.g. appName-pool).
+4. Select `Triggers` under `General Settings`.
+5. Under `Custom message`, select the cognito-domainVerify Lambda (e.g. AppName-serverless-stack-cogDomainVerify-ABCDEFGH).
+6. Select `Save Changes`.
+
+This will enable limiting signups to the email domain configured in the function.
+
+#### Push Changes
+
+Once the `config.js` file is updated, push the change to the GitHub repo; this will automatically update the application with the new config through the pipeline.
 
 #### Create CloudFront Web Distribution to provide HTTPS Support
 
