@@ -127,7 +127,7 @@
         },
         "approvalStepFunctionsRolePolicy": {
             "Type": "AWS::IAM:Policy",
-            "DependsOn": "approvalStepFunctionsRole",
+            "DependsOn": ["approvalStepFunctionsRole", "approvalAPIGatewayRole"],
             "Description": "Step Functions IAM Policy",
             "Properties": {
                 "PolicyName": "approvalStepFunctionsPolicy",
@@ -150,18 +150,21 @@
                             "logs:FilterLogEvents",
                         ],
                         "Resource": "*"
-                    },{
+                    }, {
                         "Effect": "Allow",
                         "Action": [
                             "states:*"
                         ],
                         "Resource": "*"
                     }]
-                    },
-                    "Roles": [{
+                },
+                "Roles": [{
                         "Ref": "approvalStepFunctionsRole"
-                    }]
-                }
+                    },
+                    {
+                        "Ref": "approvalAPIGatewayRole"
+                    }
+                ]
             }
         },
         "approvalStepFunctionsRole": {
@@ -178,6 +181,26 @@
                             "Service": [{
                                 "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
                             }]
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Path": "/"
+            }
+        },
+        "approvalAPIGatewayRole": {
+            "Description": "Creating service role in IAM for API Gateway",
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "${AppName}-${AWS::Region}-role"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [{
+                        "Sid": "",
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "apigateway.amazonaws.com"
                         },
                         "Action": "sts:AssumeRole"
                     }]
@@ -255,7 +278,7 @@
                                 },
                                 "x-amazon-apigateway-integration": {
                                     "credentials": {
-                                        "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
+                                        "Fn::GetAtt": ["approvalAPIGatewayRole", "Arn"]
                                     },
                                     "responses": {
                                         "default": {
@@ -336,7 +359,7 @@
                                 },
                                 "x-amazon-apigateway-integration": {
                                     "credentials": {
-                                        "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
+                                        "Fn::GetAtt": ["approvalAPIGatewayRole", "Arn"]
                                     },
                                     "responses": {
                                         "default": {
