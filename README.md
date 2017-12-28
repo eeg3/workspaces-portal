@@ -30,15 +30,39 @@ This project leverages the following services:
 
 ### User Account Creation
 
-Placeholder.
+Users can create their accounts through the register page. Anyone with an email on the Approved Domain as specified in the stack can register. 
+
+![Register Page](docs/screenshots/Example_register.png)
+
+After registering, users will receive a verification token through email. The user must enter this token on the verification page. Users are automatically redirected to the verify page after registering; however, they can also access it by accessing the site and browsing the verify from the top-right dropdown.
+
+![Verify Page](docs/screenshots/Example_verify.PNG)
+
+Once verified, the user can sign in to the portal with their created credentials. 
 
 ### Creating a WorkSpace
 
-Placeholder.
+Upon signing in, they will see the WorkSpace Request form as they have not created a WorkSpace yet. They can submit a request which will start the Approval process.
+
+![Request WorkSpace](docs/screenshots/Example_request.png)
+
+The Approver email as specified within the stack will receive an email with links to Approve or Reject the request.
+
+Upon signing in, they will see the WorkSpace Request form as they have not created a WorkSpace yet.
+
+![WorkSpace Approval](docs/screenshots/Example_approval.png)
+
+Once approved, the WorkSpace will begin automatically and immediately.
 
 ### Managing a WorkSpace
 
-Placeholder.
+After the WorkSpace is provisioned, the user will receive an email directly from Amazon with details on how to access their WorkSpace.
+
+![WorkSpace Access](docs/screenshots/Example_access.png)
+
+They can also begin managing the WorkSpace through the portal: rebuild, reboot, or delete.
+
+![WorkSpace Operations](docs/screenshots/Example_details.png)
 
 ## Deployment
 
@@ -175,11 +199,13 @@ Placeholder.
 
 ### Testing
 
-The site should now work as expected. Browse to the URL defined within `OriginURL` output of the parent CloudFormation stack (e.g. http://s3bucketportalname.s3-website-us-east-1.amazonaws.com), and select "Register" from the top right drop-down (Please note that this will be over HTTP and unencrypted at this point). Enter an email address (within the configured domain inside cogDomainVerify) and password, and select Register. You will receive a verification code from Cognito through email. Once the email is received with the token, select "Verify" from the top right drop-down; on the verify page, enter your email and the verification code provided. At this point, the site will redirect to login. Login with the authentication credentials created.
+The site should now work as expected. Browse to the URL defined within `OriginURL` output of the parent CloudFormation stack (e.g. http://s3bucketportalname.s3-website-us-east-1.amazonaws.com), and select "Register" from the top right drop-down (Please note that this will be over HTTP and unencrypted at this point). Enter an email address (within the configured domain inside cogDomainVerify) and password, and select Register. You will receive a verification code from Cognito through email. Once the email is received with the token, select "Verify" from the top right drop-down; on the verify page, enter your email and the verification code provided. At this point, the site will redirect to login. Login with the authentication credentials created. To ensure only users within the specified domain can register for the portal, test registering with an email address on an unapproved domain.
 
 On the main page, the ability to request a WorkSpace should now be displayed. Request a WorkSpace with a user (which must exist within the Directory; only include the username itself without any domain information within it) and select a Bundle to use. It should begin the approval process, and the email address configured for approvals should receive an Approval Request email within approximately 10 minutes, which is within time for the CloudWatch Event that triggers the Lambda function polling Step Functions to run (this can be configured lower within `sam.json` for the Lambda function if desired. Approve the request, and the creation process should begin.
 
-The user should receive an email with instructions on how to use their WorkSpace once it finishes provisioning. The user can also log back into the WorkSpaces Portal to try rebooting, rebuilding, or deleting the WorkSpace.
+The user should receive an email with instructions on how to use their WorkSpace once it finishes provisioning. The user can also log back into the WorkSpaces Portal to try rebooting, rebuilding, or deleting the WorkSpace. Test the ability to perform an activity under WorkSpace Operations on the provisioned WorkSpace.
+
+If everything above works, the application deployed successfully.
 
 ## Removal
 
@@ -195,10 +221,10 @@ The user should receive an email with instructions on how to use their WorkSpace
 
 As the website or serverless function is updated, simply perform the modifications within the code and then push them to the GitHub repo. Once checked in to GitHub, CodePipeline will handle the rest automatically. To test this functionality, browse to the CodePipeline page and view the pipeline while pushing a change. The pipeline will show the process from Source -> Build -> Deploy. If there are any failures, they will be visible within the pipeline.
 
-The code for the pipeline resides within the root of the project, and the pipeline itself exists as part of the parent CloudFormation stack.
+The code for the pipeline resides within the root of the project, and the pipeline itself exists as part of the parent CloudFormation stack:
 
 1. **deploy.json**: Launcher for the core services within CloudFormation (S3, CodePipeline, CodeBuild, Cognito). These are not modified by the pipeline on changes, but it does include setting up the pipeline itself. This is the CloudFormation template to launch to get setup started.
-2. **buildspec.yml**: This file is used by CodeBuild to tell it what to do on every build.
+2. **buildspec.yml**: This file is used by CodeBuild to tell it what to do on every build, such as running jekyll and copying the output to S3.
 3. **sam.json**: CloudFormation Serverless Transformation template for SAM. This template handles creation of the Lambda functions, Step Functions, and the approval API Gateway.
 
 ## Notes
