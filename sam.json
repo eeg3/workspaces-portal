@@ -159,12 +159,8 @@
                     }]
                 },
                 "Roles": [{
-                        "Ref": "approvalStepFunctionsRole"
-                    },
-                    {
-                        "Ref": "approvalAPIGatewayRole"
-                    }
-                ]
+                    "Ref": "approvalStepFunctionsRole"
+                }]
             }
         },
         "approvalStepFunctionsRole": {
@@ -181,26 +177,6 @@
                             "Service": [{
                                 "Fn::Sub": "states.${AWS::Region}.amazonaws.com"
                             }]
-                        },
-                        "Action": "sts:AssumeRole"
-                    }]
-                },
-                "Path": "/"
-            }
-        },
-        "approvalAPIGatewayRole": {
-            "Description": "Creating service role in IAM for API Gateway",
-            "Type": "AWS::IAM::Role",
-            "Properties": {
-                "RoleName": {
-                    "Fn::Sub": "${AppName}-${AWS::Region}-role"
-                },
-                "AssumeRolePolicyDocument": {
-                    "Statement": [{
-                        "Sid": "",
-                        "Effect": "Allow",
-                        "Principal": {
-                            "Service": "apigateway.amazonaws.com"
                         },
                         "Action": "sts:AssumeRole"
                     }]
@@ -278,7 +254,7 @@
                                 },
                                 "x-amazon-apigateway-integration": {
                                     "credentials": {
-                                        "Fn::GetAtt": ["approvalAPIGatewayRole", "Arn"]
+                                        "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
                                     },
                                     "responses": {
                                         "default": {
@@ -359,7 +335,7 @@
                                 },
                                 "x-amazon-apigateway-integration": {
                                     "credentials": {
-                                        "Fn::GetAtt": ["approvalAPIGatewayRole", "Arn"]
+                                        "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
                                     },
                                     "responses": {
                                         "default": {
