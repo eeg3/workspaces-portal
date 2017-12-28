@@ -36,7 +36,7 @@ Users can create their accounts through the register page. Anyone with an email 
 
 After registering, users will receive a verification token through email. The user must enter this token on the verification page. Users are automatically redirected to the verify page after registering; however, they can also access it by accessing the site and browsing the verify from the top-right dropdown.
 
-![Verify Page](docs/screenshots/Example_verify.PNG)
+![Verify Page](docs/screenshots/Example_verify.png)
 
 Once verified, the user can sign in to the portal with their created credentials. 
 
