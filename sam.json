@@ -130,7 +130,7 @@
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "RoleName": {
-                    "Fn::Sub": "${AppName}-${AWS::Region}--sfn-role"
+                    "Fn::Sub": "${AppName}-${AWS::Region}-sfn-role"
                 },
                 "AssumeRolePolicyDocument": {
                     "Statement": [{
@@ -153,24 +153,6 @@
                             "Resource": [{
                                 "Fn::GetAtt": ["workspacesCreate", "Arn"]
                             }]
-                        }, {
-                            "Effect": "Allow",
-                            "Action": [
-                                "logs:CreateLogGroup",
-                                "logs:CreateLogStream",
-                                "logs:DescribeLogGroups",
-                                "logs:DescribeLogStreams",
-                                "logs:PutLogEvents",
-                                "logs:GetLogEvents",
-                                "logs:FilterLogEvents",
-                            ],
-                            "Resource": "*"
-                        }, {
-                            "Effect": "Allow",
-                            "Action": [
-                                "states:*"
-                            ],
-                            "Resource": "*"
                         }]
                     }
                 }]
