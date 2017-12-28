@@ -125,10 +125,10 @@
                 }
             }
         },
-        "approvalStepFunctionsRolePolicy": {
+        "approvalRolePolicy": {
             "Type": "AWS::IAM:Policy",
-            "DependsOn": ["approvalStepFunctionsRole", "approvalAPIGatewayRole"],
-            "Description": "Step Functions IAM Policy",
+            "DependsOn": "approvalStepFunctionsRole",
+            "Description": "Approval Workflow IAM Policy",
             "Properties": {
                 "PolicyName": "approvalStepFunctionsPolicy",
                 "PolicyDocument": {
