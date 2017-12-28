@@ -165,7 +165,7 @@
                                 "logs:FilterLogEvents",
                             ],
                             "Resource": "*"
-                        },{
+                        }, {
                             "Effect": "Allow",
                             "Action": [
                                 "states:*"
@@ -177,7 +177,6 @@
             }
         },
         "approvalAPIGatewayRole": {
-            "Description": "Creating service role in IAM for Step Functions",
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "RoleName": {
@@ -192,37 +191,10 @@
                         "Action": "sts:AssumeRole"
                     }]
                 },
-                "Path": "/",
-                "Policies": [{
-                    "PolicyName": "workspaceCreateInvoke",
-                    "PolicyDocument": {
-                        "Statement": [{
-                            "Effect": "Allow",
-                            "Action": "lambda:InvokeFunction",
-                            "Resource": [{
-                                "Fn::GetAtt": ["workspacesCreate", "Arn"]
-                            }]
-                        }, {
-                            "Effect": "Allow",
-                            "Action": [
-                                "logs:CreateLogGroup",
-                                "logs:CreateLogStream",
-                                "logs:DescribeLogGroups",
-                                "logs:DescribeLogStreams",
-                                "logs:PutLogEvents",
-                                "logs:GetLogEvents",
-                                "logs:FilterLogEvents",
-                            ],
-                            "Resource": "*"
-                        },{
-                            "Effect": "Allow",
-                            "Action": [
-                                "states:*"
-                            ],
-                            "Resource": "*"
-                        }]
-                    }
-                }]
+                "ManagedPolicyArns": [
+                    "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs",
+                    "arn:aws:iam::aws:policy/AWSStepFunctionsFullAccess"
+                ]
             }
         },
         "approvalManualActivity": {
