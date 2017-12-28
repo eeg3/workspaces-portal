@@ -125,50 +125,12 @@
                 }
             }
         },
-        "approvalRolePolicy": {
-            "Type": "AWS::IAM:Policy",
-            "DependsOn": "approvalStepFunctionsRole",
-            "Description": "Approval Workflow IAM Policy",
-            "Properties": {
-                "PolicyName": "approvalStepFunctionsPolicy",
-                "PolicyDocument": {
-                    "Statement:": [{
-                        "Effect": "Allow",
-                        "Action": "lambda:InvokeFunction",
-                        "Resource": [{
-                            "Fn::GetAtt": ["workspacesCreate", "Arn"]
-                        }]
-                    }, {
-                        "Effect": "Allow",
-                        "Action": [
-                            "logs:CreateLogGroup",
-                            "logs:CreateLogStream",
-                            "logs:DescribeLogGroups",
-                            "logs:DescribeLogStreams",
-                            "logs:PutLogEvents",
-                            "logs:GetLogEvents",
-                            "logs:FilterLogEvents",
-                        ],
-                        "Resource": "*"
-                    }, {
-                        "Effect": "Allow",
-                        "Action": [
-                            "states:*"
-                        ],
-                        "Resource": "*"
-                    }]
-                },
-                "Roles": [{
-                    "Ref": "approvalStepFunctionsRole"
-                }]
-            }
-        },
         "approvalStepFunctionsRole": {
             "Description": "Creating service role in IAM for Step Functions",
             "Type": "AWS::IAM::Role",
             "Properties": {
                 "RoleName": {
-                    "Fn::Sub": "${AppName}-${AWS::Region}-role"
+                    "Fn::Sub": "${AppName}-${AWS::Region}--sfn-role"
                 },
                 "AssumeRolePolicyDocument": {
                     "Statement": [{
@@ -181,7 +143,86 @@
                         "Action": "sts:AssumeRole"
                     }]
                 },
-                "Path": "/"
+                "Path": "/",
+                "Policies": [{
+                    "PolicyName": "workspaceCreateInvoke",
+                    "PolicyDocument": {
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": "lambda:InvokeFunction",
+                            "Resource": [{
+                                "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                            }]
+                        }, {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogGroup",
+                                "logs:CreateLogStream",
+                                "logs:DescribeLogGroups",
+                                "logs:DescribeLogStreams",
+                                "logs:PutLogEvents",
+                                "logs:GetLogEvents",
+                                "logs:FilterLogEvents",
+                            ],
+                            "Resource": "*"
+                        },{
+                            "Effect": "Allow",
+                            "Action": [
+                                "states:*"
+                            ],
+                            "Resource": "*"
+                        }]
+                    }
+                }]
+            }
+        },
+        "approvalAPIGatewayRole": {
+            "Description": "Creating service role in IAM for Step Functions",
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+                "RoleName": {
+                    "Fn::Sub": "${AppName}-${AWS::Region}-apigw-role"
+                },
+                "AssumeRolePolicyDocument": {
+                    "Statement": [{
+                        "Effect": "Allow",
+                        "Principal": {
+                            "Service": "apigateway.amazonaws.com"
+                        },
+                        "Action": "sts:AssumeRole"
+                    }]
+                },
+                "Path": "/",
+                "Policies": [{
+                    "PolicyName": "workspaceCreateInvoke",
+                    "PolicyDocument": {
+                        "Statement": [{
+                            "Effect": "Allow",
+                            "Action": "lambda:InvokeFunction",
+                            "Resource": [{
+                                "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                            }]
+                        }, {
+                            "Effect": "Allow",
+                            "Action": [
+                                "logs:CreateLogGroup",
+                                "logs:CreateLogStream",
+                                "logs:DescribeLogGroups",
+                                "logs:DescribeLogStreams",
+                                "logs:PutLogEvents",
+                                "logs:GetLogEvents",
+                                "logs:FilterLogEvents",
+                            ],
+                            "Resource": "*"
+                        },{
+                            "Effect": "Allow",
+                            "Action": [
+                                "states:*"
+                            ],
+                            "Resource": "*"
+                        }]
+                    }
+                }]
             }
         },
         "approvalManualActivity": {
@@ -254,7 +295,7 @@
                                 },
                                 "x-amazon-apigateway-integration": {
                                     "credentials": {
-                                        "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
+                                        "Fn::GetAtt": ["approvalAPIGatewayRole", "Arn"]
                                     },
                                     "responses": {
                                         "default": {
@@ -335,7 +376,7 @@
                                 },
                                 "x-amazon-apigateway-integration": {
                                     "credentials": {
-                                        "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
+                                        "Fn::GetAtt": ["approvalAPIGatewayRole", "Arn"]
                                     },
                                     "responses": {
                                         "default": {
