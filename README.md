@@ -195,7 +195,7 @@ Once the `config.js` file is updated, push the change to the GitHub repo; this w
 
 #### Create CloudFront Web Distribution to provide HTTPS Support
 
-Placeholder.
+In order to provide HTTPS coverage for the portal, create a CloudFront Web Distribution. This could be created automatically, but it's unlikely that a *.cloudfront.net address is desired. Instead, that is left up to the administrator to manually deploy using their desired domain name with a related SSL certificate.
 
 ### Testing
 
