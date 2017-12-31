@@ -421,14 +421,6 @@
                 "AttributeDefinitions": [{
                         "AttributeName": "WorkspaceId",
                         "AttributeType": "S"
-                    },
-                    {
-                        "AttributeName": "Note",
-                        "AttributeType": "S"
-                    },
-                    {
-                        "AttributeName": "LastModification",
-                        "AttributeType": "S"
                     }
                 ],
                 "KeySchema": [{
