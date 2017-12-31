@@ -465,7 +465,7 @@
             }
         },
         "S3ArtifactsBucket": {
-            "Description": "Creating Amazon S3 bucket for AWS CodePipeline artifacts",
+            "Description": "Creating S3 bucket for AWS CodePipeline artifacts",
             "Type": "AWS::S3::Bucket",
             "DeletionPolicy": "Retain",
             "Properties": {
