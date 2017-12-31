@@ -414,6 +414,43 @@
                 "Description": "Respond Deployment",
                 "StageName": "respond"
             }
+        },
+        "WorkspaceDetailsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [{
+                        "AttributeName": "WorkspaceId",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Note",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "LastModification",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [{
+                    "AttributeName": "WorkspaceId",
+                    "KeyType": "HASH"
+                }],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                },
+                "TableName": {
+                    "Fn::Sub": "${AppName}-${AWS::Region}-workspaces"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "WorkspaceDetailsTable": {
+            "Value": {
+                "Ref": "WorkspaceDetailsTable"
+            },
+            "Description": "Table name for WorkSpace Details"
         }
     }
 }
