@@ -29,7 +29,7 @@
         "DirectoryServicesId": {
             "Type": "String",
             "Description": "Directory Services ID configured within Amazon WorkSpaces.",
-            "Default": "d-90672a878e"
+            "Default": "d-9267276f54"
         },
         "ApprovedDomain": {
             "Type": "String",
