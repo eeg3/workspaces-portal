@@ -22,15 +22,23 @@ exports.handler = (event, context, callback) => {
 
     if (action == "get") {
 
-        var user = JSON.parse(event.body)["user"];
+        var username = JSON.parse(event.body)["username"];
+        var email = JSON.parse(event.body)["email"];
+        console.log("Table to search: " + tableName);
+        console.log("User to search for: " + username);
+        console.log("Email to search for: " + email);
+        
         var params = {
             TableName: tableName,
             Key: {
                 'Username': {
-                    S: user
+                    S: username
                 },
+                'Email': {
+                    S: email
+                }
             },
-            ProjectionExpression: 'Username,Email,Status'
+            ProjectionExpression: 'Username,Email,WS_Status'
         };
 
         // Call DynamoDB to read the item from the table
@@ -49,11 +57,11 @@ exports.handler = (event, context, callback) => {
             } else if (data.Item) {
                 console.log("Username: " + data.Item.Username.S);
                 console.log("Email: " + data.Item.Email.S)
-                console.log("Status: " + data.Item.Status.S)
+                console.log("Status: " + data.Item.WS_Status.S)
                 callback(null, {
                     "statusCode": 200,
                     "body": JSON.stringify({
-                        Result: JSON.stringify(data.Item)
+                        Result: data.Item
                     }),
                     "headers": {
                         "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
@@ -78,26 +86,40 @@ exports.handler = (event, context, callback) => {
 
     } else if (action == "put") {
 
-        var user = JSON.parse(event.body)["user"];
+        var username = JSON.parse(event.body)["username"];
         var email = JSON.parse(event.body)["email"];
-        var status = JSON.parse(event.body)["status"];
+        var ws_status = JSON.parse(event.body)["ws_status"];
+        console.log("Table to search: " + tableName);
+        console.log("User to update: " + username);
+        console.log("Email to update: " + email);
+        console.log("Status to update: " + ws_status);
+
         var params = {
             TableName: tableName,
-            Item: {
+            Key: {
                 'Username': {
-                    S: user
+                    S: username
                 },
                 'Email': {
                     S: email
-                },
-                'Status': {
-                    S: status
                 }
             }
         };
 
+        if (ws_status != undefined) {
+            params.ExpressionAttributeNames = {
+                "#WSS": "WS_Status"
+            };
+            params.ExpressionAttributeValues = {
+                ":s": {
+                    S: ws_status
+                }
+            };
+            params.UpdateExpression = "SET #WSS = :s";
+        }
+
         // Call DynamoDB to add the item to the table
-        ddb.putItem(params, function (err, data) {
+        ddb.updateItem(params, function (err, data) {
             if (err) {
                 console.log("Error", err);
                 callback(null, {
