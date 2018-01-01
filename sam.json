@@ -459,9 +459,6 @@
                 "ProvisionedThroughput": {
                     "ReadCapacityUnits": "5",
                     "WriteCapacityUnits": "5"
-                },
-                "TableName": {
-                    "Fn::Sub": "${AppName}-${AWS::Region}-workspaces"
                 }
             }
         }
