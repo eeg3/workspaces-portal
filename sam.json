@@ -125,6 +125,26 @@
                 }
             }
         },
+        "workspacesDetails": {
+            "Type": "AWS::Serverless::Function",
+            "DependsOn": "WorkspaceDetailsTable",
+            "Properties": {
+                "Handler": "workspaces-details.handler",
+                "Runtime": "nodejs4.3",
+                "CodeUri": "./lambda/workspaces-details/",
+                "Policies": "AmazonDynamoDBFullAccess",
+                "Environment": {
+                    "Variables": {
+                        "ORIGIN_URL": {
+                            "Ref": "OriginUrl"
+                        },
+                        "DETAILS_TABLE_NAME": {
+                            "Ref": "WorkspaceDetailsTable"
+                        }
+                    }
+                }
+            }
+        },
         "approvalStepFunctionsRole": {
             "Description": "Creating service role in IAM for Step Functions",
             "Type": "AWS::IAM::Role",
@@ -419,14 +439,23 @@
             "Type": "AWS::DynamoDB::Table",
             "Properties": {
                 "AttributeDefinitions": [{
-                        "AttributeName": "WorkspaceId",
+                        "AttributeName": "Username",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Email",
                         "AttributeType": "S"
                     }
                 ],
                 "KeySchema": [{
-                    "AttributeName": "WorkspaceId",
-                    "KeyType": "HASH"
-                }],
+                        "AttributeName": "Username",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "Email",
+                        "KeyType": "RANGE"
+                    }
+                ],
                 "ProvisionedThroughput": {
                     "ReadCapacityUnits": "5",
                     "WriteCapacityUnits": "5"
