@@ -18,18 +18,28 @@ exports.handler = (event, context, callback) => {
 
     // DynamoDB Table should consist of a primary key based on the Username and Email have secondary values of Status and WorkspaceId.
 
-    // The Lambda will receive parameters in two manners:
+    // The Lambda will receive parameters in three manners:
     //  1: JSON when called directly (e.g. "body": "{\"action\":\"put\",\"username\":\"earl\",\"email\":\"earl@eeg3.net\",\"ws_status\":\"Requested\"}" )
-    //  2: CSV when declined through API Gateway
-    // Therefore, do a try/catch in order to find out which one the function is dealing with. If 'action' variable stays undefined, it is through #2 (CSV).
-    try {
+    //  2: JSON when called indirectly (i.e. the same as #1 except not inside a body parameter)
+    //  3: CSV when declined through API Gateway
+    // Therefore, do a try/catch in order to find out which one the function is dealing with. If 'action' variable stays undefined, it is through #3 (CSV).
+    try { // Check see if it's #1
         var action = JSON.parse(event.body)["action"];
+        var username = JSON.parse(event.body)["requesterUsername"];
+        var email = JSON.parse(event.body)["requesterEmailAddress"];
+        var ws_status = JSON.parse(event.body)["ws_status"];
     } catch (err) {}
 
-    if (action == "get") {
+    if (action == undefined) { // Check to see if it's #2
+        try {
+            var action = JSON.parse(event)["action"];
+            var username = JSON.parse(event)["requesterUsername"];
+            var email = JSON.parse(event)["requesterEmailAddress"];
+            var ws_status = JSON.parse(event)["ws_status"];
+        } catch (err) {}
+    }
 
-        var username = JSON.parse(event.body)["username"];
-        var email = JSON.parse(event.body)["email"];
+    if (action == "get") {
         console.log("Table to search: " + tableName);
         console.log("User to search for: " + username);
         console.log("Email to search for: " + email);
@@ -91,10 +101,6 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "put") {
-
-        var username = JSON.parse(event.body)["requesterUsername"];
-        var email = JSON.parse(event.body)["requesterEmailAddress"];
-        var ws_status = JSON.parse(event.body)["ws_status"];
         console.log("Table to search: " + tableName);
         console.log("User to update: " + username);
         console.log("Email to update: " + email);
@@ -155,10 +161,10 @@ exports.handler = (event, context, callback) => {
             }
         });
 
-    } else if (action == undefined) {
+    } else if (action == undefined) { // If still undefined, it's #3
 
-        var email = event.body.split(",")[0];
-        var username = event.body.split(",")[1];
+        var email = event.split(",")[0];
+        var username = event.split(",")[1];
         var ws_status = "Rejected"; // This function is only called in the event of a failure.
     
         console.log("Table to use: " + tableName);
