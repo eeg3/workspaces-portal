@@ -59,6 +59,7 @@
                 "Handler": "workspaces-control.handler",
                 "Runtime": "nodejs4.3",
                 "CodeUri": "./lambda/workspaces-control/",
+                "Timeout": 5,
                 "Policies": ["AmazonWorkSpacesAdmin", "AWSStepFunctionsFullAccess"],
                 "Environment": {
                     "Variables": {
@@ -172,6 +173,9 @@
                             "Action": "lambda:InvokeFunction",
                             "Resource": [{
                                 "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                            },
+                            {
+                                "Fn::GetAtt": ["workspacesDetails", "Arn"]
                             }]
                         }]
                     }
