@@ -258,6 +258,37 @@
                 }
             }
         },
+        "approvalStateMachine3": {
+            "Type": "AWS::StepFunctions::StateMachine",
+            "Properties": {
+                "StateMachineName": {
+                    "Fn::Sub": "${AppName}-StateMachine3"
+                },
+                "DefinitionString": {
+                    "Fn::Join": ["", ["{ \"StartAt\": \"WorkspaceApproval\", \"States\": { \"WorkspaceApproval\": { \"Type\": \"Parallel\", \"Branches\": [{ \"StartAt\": \"approvalManualActivity\", \"States\": { \"approvalManualActivity\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Ref": "approvalManualActivity"
+                        },
+                        "\", \"TimeoutSeconds\": 3600, \"Catch\": [{ \"ErrorEquals\": [\"States.TaskFailed\"], \"Next\": \"updateFinalWSDetailStatus\" }], \"Next\": \"workspacesCreate\" }, \"workspacesCreate\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                        },
+                        "\", \"Next\": \"updateFinalWSDetailStatus\" }, \"updateFinalWSDetailStatus\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Fn::GetAtt": ["workspacesDetails", "Arn"]
+                        },
+                        "\", \"End\": true } } }, { \"StartAt\": \"updateInitialWSDetailStatus\", \"States\": { \"updateInitialWSDetailStatus\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Fn::GetAtt": ["workspacesDetails", "Arn"]
+                        },
+                        "\", \"End\": true } } }], \"End\": true } } }"
+                    ]]
+                },
+                "RoleArn": {
+                    "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
+                }
+            }
+        },
         "approvalResponderAPI": {
             "Type": "AWS::ApiGateway::RestApi",
             "Properties": {
