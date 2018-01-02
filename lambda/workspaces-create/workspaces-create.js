@@ -68,14 +68,7 @@ exports.handler = (event, context, callback) => {
             console.log("Result: " + JSON.stringify(data));
             callback(null, {
                 "statusCode": 200,
-                "body": JSON.stringify({
-                    Result: data
-                }),
-                "headers": {
-                    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                    "Access-Control-Allow-Methods": "GET,OPTIONS",
-                    "Access-Control-Allow-Origin": originURL
-                }
+                "body": event.requestContext.authorizer.claims.email + "," + JSON.parse(event.body)["username"]
             });
         }
     });

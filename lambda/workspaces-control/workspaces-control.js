@@ -97,6 +97,7 @@ exports.handler = (event, context, callback) => {
             stateMachineArn: stateMachine,
             /* required */
             input: JSON.stringify({
+                "action": "put",
                 "requesterEmailAddress": event.requestContext.authorizer.claims.email,
                 "requesterUsername": JSON.parse(event.body)["username"],
                 "requesterBundle": JSON.parse(event.body)["bundle"]
