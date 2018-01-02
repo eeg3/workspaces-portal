@@ -211,7 +211,7 @@
             "Type": "AWS::StepFunctions::StateMachine",
             "Properties": {
                 "StateMachineName": {
-                    "Fn::Sub": "${AppName}-StateMachine3"
+                    "Fn::Sub": "${AppName}-StateMachine"
                 },
                 "DefinitionString": {
                     "Fn::Join": ["", ["{ \"StartAt\": \"WorkspaceApproval\", \"States\": { \"WorkspaceApproval\": { \"Type\": \"Parallel\", \"Branches\": [{ \"StartAt\": \"approvalManualActivity\", \"States\": { \"approvalManualActivity\": { \"Type\": \"Task\", \"Resource\": \"",
