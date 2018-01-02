@@ -100,7 +100,8 @@ exports.handler = (event, context, callback) => {
                 "action": "put",
                 "requesterEmailAddress": event.requestContext.authorizer.claims.email,
                 "requesterUsername": JSON.parse(event.body)["username"],
-                "requesterBundle": JSON.parse(event.body)["bundle"]
+                "requesterBundle": JSON.parse(event.body)["bundle"],
+                "ws_status": "Requested"
             })
         };
         stepfunctions.startExecution(stepParams, function (err, data) {

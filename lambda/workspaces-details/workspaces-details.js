@@ -20,7 +20,7 @@ exports.handler = (event, context, callback) => {
 
     // The Lambda will receive parameters in two manners:
     //  1: JSON when called directly (e.g. "body": "{\"action\":\"put\",\"username\":\"earl\",\"email\":\"earl@eeg3.net\",\"ws_status\":\"Requested\"}" )
-    //  2: CSV when called after approved / declined through API Gateway
+    //  2: CSV when declined through API Gateway
     // Therefore, do a try/catch in order to find out which one the function is dealing with. If 'action' variable stays undefined, it is through #2 (CSV).
     try {
         var action = JSON.parse(event.body)["action"];
@@ -159,7 +159,7 @@ exports.handler = (event, context, callback) => {
 
         var email = event.body.split(",")[0];
         var username = event.body.split(",")[1];
-        var ws_status = "Ready";
+        var ws_status = "Rejected"; // This function is only called in the event of a failure.
     
         console.log("Table to use: " + tableName);
         console.log("User to update: " + username);

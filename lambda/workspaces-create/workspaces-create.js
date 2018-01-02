@@ -68,7 +68,13 @@ exports.handler = (event, context, callback) => {
             console.log("Result: " + JSON.stringify(data));
             callback(null, {
                 "statusCode": 200,
-                "body": event.requestContext.authorizer.claims.email + "," + JSON.parse(event.body)["username"]
+                "body": JSON.stringify({
+                    "action": "put",
+                    "requesterEmailAddress": event.requestContext.authorizer.claims.email,
+                    "requesterUsername": JSON.parse(event.body)["username"],
+                    "requesterBundle": JSON.parse(event.body)["bundle"],
+                    "ws_status": "Approved"
+                })
             });
         }
     });
