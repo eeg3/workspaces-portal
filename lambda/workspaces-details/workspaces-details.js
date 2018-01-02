@@ -30,8 +30,6 @@ exports.handler = (event, context, callback) => {
         var ws_status = JSON.parse(event.body)["ws_status"];
     } catch (err) {}
 
-    console.log("after first try, actions value is: " + action);
-
     if (action == undefined) { // Check to see if it's #2
         try {
             var action = event["action"];
@@ -40,9 +38,6 @@ exports.handler = (event, context, callback) => {
             var ws_status = event["ws_status"];
         } catch (err) {}
     }
-
-    console.log("after second try, actions value is: " + action);
-
 
     if (action == "get") {
         console.log("Table to search: " + tableName);
