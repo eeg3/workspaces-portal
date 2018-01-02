@@ -70,9 +70,8 @@ exports.handler = (event, context, callback) => {
                 "statusCode": 200,
                 "body": JSON.stringify({
                     "action": "put",
-                    "requesterEmailAddress": event.requestContext.authorizer.claims.email,
-                    "requesterUsername": JSON.parse(event.body)["username"],
-                    "requesterBundle": JSON.parse(event.body)["bundle"],
+                    "requesterEmailAddress": requesterEmail,
+                    "requesterUsername": requesterUsername,
                     "ws_status": "Approved"
                 })
             });
