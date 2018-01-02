@@ -30,20 +30,25 @@ exports.handler = (event, context, callback) => {
         var ws_status = JSON.parse(event.body)["ws_status"];
     } catch (err) {}
 
+    console.log("after first try, actions value is: " + action);
+
     if (action == undefined) { // Check to see if it's #2
         try {
-            var action = JSON.parse(event)["action"];
-            var username = JSON.parse(event)["requesterUsername"];
-            var email = JSON.parse(event)["requesterEmailAddress"];
-            var ws_status = JSON.parse(event)["ws_status"];
+            var action = event["action"];
+            var username = event["requesterUsername"];
+            var email = event["requesterEmailAddress"];
+            var ws_status = event["ws_status"];
         } catch (err) {}
     }
+
+    console.log("after second try, actions value is: " + action);
+
 
     if (action == "get") {
         console.log("Table to search: " + tableName);
         console.log("User to search for: " + username);
         console.log("Email to search for: " + email);
-        
+
         var params = {
             TableName: tableName,
             Key: {
@@ -166,7 +171,7 @@ exports.handler = (event, context, callback) => {
         var email = event.split(",")[0];
         var username = event.split(",")[1];
         var ws_status = "Rejected"; // This function is only called in the event of a failure.
-    
+
         console.log("Table to use: " + tableName);
         console.log("User to update: " + username);
         console.log("Email to update: " + email);
