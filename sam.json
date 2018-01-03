@@ -68,6 +68,9 @@
                         },
                         "STATE_MACHINE_ARN": {
                             "Ref": "approvalStateMachine"
+                        },
+                        "DETAILS_LAMBDA": {
+                            "Ref": "workspacesDetails"
                         }
                     }
                 }
