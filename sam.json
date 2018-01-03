@@ -120,7 +120,7 @@
                     "Timer": {
                         "Type": "Schedule",
                         "Properties": {
-                            "Schedule": "rate(10 minutes)"
+                            "Schedule": "rate(5 minutes)"
                         }
                     }
                 }
@@ -293,7 +293,7 @@
                                     "passthroughBehavior": "when_no_templates",
                                     "httpMethod": "POST",
                                     "requestTemplates": {
-                                        "application/json": "{\n   \"cause\": \"Reject link was clicked.\",\n   \"error\": \"Rejected\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
+                                        "application/json": "{\n   \"output\": \"\\\"$input.params('requesterEmailAddress'),$input.params('requesterUsername'),$input.params('requesterBundle')\\\"\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
                                     },
                                     "type": "aws"
                                 }
