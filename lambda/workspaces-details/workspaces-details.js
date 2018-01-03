@@ -163,8 +163,8 @@ exports.handler = (event, context, callback) => {
 
     } else if (action == undefined) { // If still undefined, it's #3
 
-        var email = event.split(",")[0];
-        var username = event.split(",")[1];
+        var email = event.Cause.split(",")[0];
+        var username = event.Cause.split(",")[1];
         var ws_status = "Rejected"; // This function is only called in the event of a failure.
 
         console.log("Table to use: " + tableName);
