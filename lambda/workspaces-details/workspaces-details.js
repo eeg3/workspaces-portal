@@ -12,7 +12,7 @@ exports.handler = (event, context, callback) => {
 
     var originURL = process.env.ORIGIN_URL || '*';
 
-    var tableName = process.env.DETAILS_TABLE_NAME || 'wsp-db-int-serverless-stack-WorkspaceDetailsTable-WTRSGHNEH36H';
+    var tableName = process.env.DETAILS_TABLE_NAME || 'wsp-db-int-serverless-stack-WorkspaceDetailsTable-1SC7FPUK3PFJ8';
 
     console.log('Received event:', JSON.stringify(event, null, 2));
 
@@ -45,12 +45,14 @@ exports.handler = (event, context, callback) => {
         console.log("User to search for: " + username);
         console.log("Email to search for: " + email);
 
+        // OLD WITH GETITEM
+        /*
         var params = {
             TableName: tableName,
             Key: {
                 'Username': {
                     S: username
-                },
+                }
                 'Email': {
                     S: email
                 }
@@ -62,44 +64,39 @@ exports.handler = (event, context, callback) => {
         ddb.getItem(params, function (err, data) {
             if (err) {
                 console.log("Error", err);
-                callback(null, {
-                    statusCode: 500,
-                    body: JSON.stringify({
-                        Error: err,
-                    }),
-                    headers: {
-                        'Access-Control-Allow-Origin': '*',
-                    },
-                });
+                callback(null, err);
             } else if (data.Item) {
                 console.log("Username: " + data.Item.Username.S);
                 console.log("Email: " + data.Item.Email.S)
                 console.log("Status: " + data.Item.WS_Status.S)
-                callback(null, {
-                    "statusCode": 200,
-                    "body": JSON.stringify({
-                        Result: data.Item
-                    }),
-                    "headers": {
-                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                        "Access-Control-Allow-Methods": "GET,OPTIONS",
-                        "Access-Control-Allow-Origin": originURL
-                    }
-                });
+                callback(null, data.Item);
             } else {
-                callback(null, {
-                    "statusCode": 200,
-                    "body": JSON.stringify({
-                        Note: "E_NOT_FOUND"
-                    }),
-                    "headers": {
-                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                        "Access-Control-Allow-Methods": "GET,OPTIONS",
-                        "Access-Control-Allow-Origin": originURL
-                    }
-                });
+                callback(null, "E_NOT_FOUND");
             }
         });
+        */
+
+        var params = {
+            ExpressionAttributeValues: {
+             ":email": {
+               S: email
+              }
+            },
+            FilterExpression: "contains (Email, :email)",
+            ProjectionExpression: "Email, Username, WS_Status",
+            TableName: tableName
+           };
+           
+           ddb.scan(params, function(err, data) {
+             if (err) {
+               console.log("Error", err);
+             } else {
+               data.Items.forEach(function(element, index, array) {
+                 console.log(element.Email.S + " (" + element.Username.S + "): " + element.WS_Status.S);
+               });
+               callback(null, data.Items);
+             }
+           });
 
     } else if (action == "put") {
         console.log("Table to search: " + tableName);
@@ -166,7 +163,7 @@ exports.handler = (event, context, callback) => {
 
         var email = event.Cause.split(",")[0];
         var username = event.Cause.split(",")[1];
-        var ws_status = event.Error; 
+        var ws_status = event.Error;
 
         console.log("Table to use: " + tableName);
         console.log("User to update: " + username);

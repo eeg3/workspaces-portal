@@ -11,6 +11,9 @@ var workspaces = new AWS.WorkSpaces({
 // Create the Step Functions service object
 var stepfunctions = new AWS.StepFunctions();
 
+// Create the Lambda service object
+var lambda = new AWS.Lambda();
+
 exports.handler = (event, context, callback) => {
 
     var originURL = process.env.ORIGIN_URL || '*'; // Origin URL to allow for CORS
@@ -64,7 +67,6 @@ exports.handler = (event, context, callback) => {
                                         if (err) {
                                             console.log(err, err.stack);
                                         } else {
-                                            console.log("Finally: " + data);
                                             callback(null, {
                                                 "statusCode": 200,
                                                 "body": JSON.stringify(data.Workspaces[0]),
@@ -83,6 +85,45 @@ exports.handler = (event, context, callback) => {
                         }
                     });
                 }
+
+            }
+        });
+
+    } else if (action == "details") {
+        var detailsLambda = process.env.DETAILS_LAMBDA || 'wsp-db-int-serverless-stack-workspacesDetails-1J4ZB3URZF2QP';
+
+        var payloadString = JSON.stringify({
+            "action": "get",
+            "requesterEmailAddress": event.requestContext.authorizer.claims.email
+        });
+        var detailsParams = {
+            FunctionName: detailsLambda,
+            Payload: JSON.stringify({
+                "body": payloadString
+            })
+        };
+
+        lambda.invoke(detailsParams, function (err, data) {
+            if (err) {
+                console.log(err, err.stack);
+            } else {
+                console.log("Data: " + JSON.stringify(data));
+
+                console.log("Payload: " + data.Payload);
+
+                for (var i = 0; i < JSON.parse(data.Payload).length; i++) {
+                    console.log("Username #" + i + ": " + JSON.parse(data.Payload)[i].Username.S)
+                }
+
+                callback(null, {
+                    "statusCode": 200,
+                    "body": data.Payload,
+                    "headers": {
+                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                        "Access-Control-Allow-Origin": originURL
+                    }
+                });
 
             }
         });
