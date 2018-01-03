@@ -23,6 +23,7 @@ exports.handler = (event, context, callback) => {
     //  2: JSON when called indirectly (i.e. the same as #1 except not inside a body parameter)
     //  3: CSV when declined through API Gateway
     // Therefore, do a try/catch in order to find out which one the function is dealing with. If 'action' variable stays undefined, it is through #3 (CSV).
+
     try { // Check see if it's #1
         var action = JSON.parse(event.body)["action"];
         var username = JSON.parse(event.body)["requesterUsername"];
@@ -109,11 +110,11 @@ exports.handler = (event, context, callback) => {
         var params = {
             TableName: tableName,
             Key: {
-                'Username': {
-                    S: username
-                },
                 'Email': {
                     S: email
+                },
+                'Username': {
+                    S: username
                 }
             }
         };
@@ -165,7 +166,7 @@ exports.handler = (event, context, callback) => {
 
         var email = event.Cause.split(",")[0];
         var username = event.Cause.split(",")[1];
-        var ws_status = "Rejected"; // This function is only called in the event of a failure.
+        var ws_status = event.Error; 
 
         console.log("Table to use: " + tableName);
         console.log("User to update: " + username);
@@ -175,11 +176,11 @@ exports.handler = (event, context, callback) => {
         var params = {
             TableName: tableName,
             Key: {
-                'Username': {
-                    S: username
-                },
                 'Email': {
                     S: email
+                },
+                'Username': {
+                    S: username
                 }
             }
         };

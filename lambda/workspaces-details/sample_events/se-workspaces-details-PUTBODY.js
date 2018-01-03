@@ -3,5 +3,5 @@ module.exports =
     "requestContext": {
         "httpMethod": "POST"
     },
-    "body": "{\"action\":\"put\",\"requesterUsername\":\"earl\",\"requesterEmailAddress\":\"earl@eeg3.net\",\"ws_status\":\"Requested\"}"
+    "body": "{\"action\":\"put\",\"requesterEmailAddress\":\"earl@eeg3.net\",\"requesterUsername\":\"earl\",\"ws_status\":\"Requested\"}"
 };

@@ -450,20 +450,20 @@
             "Type": "AWS::DynamoDB::Table",
             "Properties": {
                 "AttributeDefinitions": [{
-                        "AttributeName": "Username",
+                        "AttributeName": "Email",
                         "AttributeType": "S"
                     },
                     {
-                        "AttributeName": "Email",
+                        "AttributeName": "Username",
                         "AttributeType": "S"
                     }
                 ],
                 "KeySchema": [{
-                        "AttributeName": "Username",
+                        "AttributeName": "Email",
                         "KeyType": "HASH"
                     },
                     {
-                        "AttributeName": "Email",
+                        "AttributeName": "Username",
                         "KeyType": "RANGE"
                     }
                 ],
