@@ -293,7 +293,7 @@
                                     "passthroughBehavior": "when_no_templates",
                                     "httpMethod": "POST",
                                     "requestTemplates": {
-                                        "application/json": "{\n   \"output\": \"\\\"$input.params('requesterEmailAddress'),$input.params('requesterUsername'),$input.params('requesterBundle')\\\"\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
+                                        "application/json": "{\n   \"error\": \"Rejected\",\n   \"cause\": \"\\\"$input.params('requesterEmailAddress'),$input.params('requesterUsername'),$input.params('requesterBundle')\\\"\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
                                     },
                                     "type": "aws"
                                 }
