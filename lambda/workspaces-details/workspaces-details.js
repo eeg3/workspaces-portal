@@ -45,37 +45,6 @@ exports.handler = (event, context, callback) => {
         console.log("User to search for: " + username);
         console.log("Email to search for: " + email);
 
-        // OLD WITH GETITEM
-        /*
-        var params = {
-            TableName: tableName,
-            Key: {
-                'Username': {
-                    S: username
-                }
-                'Email': {
-                    S: email
-                }
-            },
-            ProjectionExpression: 'Username,Email,WS_Status'
-        };
-
-        // Call DynamoDB to read the item from the table
-        ddb.getItem(params, function (err, data) {
-            if (err) {
-                console.log("Error", err);
-                callback(null, err);
-            } else if (data.Item) {
-                console.log("Username: " + data.Item.Username.S);
-                console.log("Email: " + data.Item.Email.S)
-                console.log("Status: " + data.Item.WS_Status.S)
-                callback(null, data.Item);
-            } else {
-                callback(null, "E_NOT_FOUND");
-            }
-        });
-        */
-
         var params = {
             ExpressionAttributeValues: {
              ":email": {

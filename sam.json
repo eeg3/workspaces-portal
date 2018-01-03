@@ -60,7 +60,7 @@
                 "Runtime": "nodejs4.3",
                 "CodeUri": "./lambda/workspaces-control/",
                 "Timeout": 5,
-                "Policies": ["AmazonWorkSpacesAdmin", "AWSStepFunctionsFullAccess"],
+                "Policies": ["AmazonWorkSpacesAdmin", "AWSStepFunctionsFullAccess", "AWSLambdaRole"],
                 "Environment": {
                     "Variables": {
                         "ORIGIN_URL": {

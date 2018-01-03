@@ -59,8 +59,7 @@ var authToken;
             headers: {
                 Authorization: authToken
             },
-            beforeSend: function () {
-            },
+            beforeSend: function () {},
             complete: function () {},
             data: JSON.stringify({
                 action: 'create',
@@ -93,8 +92,7 @@ var authToken;
             headers: {
                 Authorization: authToken
             },
-            beforeSend: function () {
-            },
+            beforeSend: function () {},
             complete: function () {},
             data: JSON.stringify({
                 action: 'reboot'
@@ -128,8 +126,7 @@ var authToken;
             headers: {
                 Authorization: authToken
             },
-            beforeSend: function () {
-            },
+            beforeSend: function () {},
             complete: function () {},
             data: JSON.stringify({
                 action: 'rebuild'
@@ -205,6 +202,27 @@ var authToken;
         if (!_config.api.invokeUrl) { // Show this message if the Portal's API is not configured.
             $('#noApiMessage').show();
         }
+
+        $.ajax({
+            method: 'POST',
+            url: WORKSPACES_CONTROL_URL,
+            headers: {
+                Authorization: authToken
+            },
+            beforeSend: function () {},
+            complete: function () {},
+            data: JSON.stringify({
+                action: 'details'
+            }),
+            contentType: 'text/plain',
+            error: function () {
+
+            },
+            success: function (data) {
+                console.log("Details: " + data)
+            }
+        });
+
 
         $.ajax({
             method: 'POST',
