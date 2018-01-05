@@ -134,7 +134,7 @@ exports.handler = (event, context, callback) => {
             "action": "put",
             "requesterEmailAddress": "earl@eeg3.net", //event.requestContext.authorizer.claims.email,
             "requesterUsername": "earltest", //JSON.parse(event.body)["username"],
-            "ws_status": ""
+            "ws_status": "Acknowledged"
         });
 
         var ackParams = {
