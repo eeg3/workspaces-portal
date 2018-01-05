@@ -208,7 +208,7 @@ var authToken;
     function clearAlerts(elementName) {
         var alerts = ["alert-success", "alert-danger", "alert-warning"];
 
-        alerts.forEach(function(item) {
+        alerts.forEach(function (item) {
             $(elementName).removeClass(item);
         });
     }
@@ -251,6 +251,28 @@ var authToken;
                         $("#methodStatus").addClass("alert-danger");
                         $("#methodMessage").html("Desktop request rejected.");
                         $("#methodCommand").html('<button id="acknowledgeReject" class="btn btn-primary">Acknowledge</button>');
+
+                        $("#acknowledgeReject").on('click', function () {
+                            $.ajax({
+                                method: 'POST',
+                                url: WORKSPACES_CONTROL_URL,
+                                headers: {
+                                    Authorization: authToken
+                                },
+                                beforeSend: function () {},
+                                complete: function () {},
+                                data: JSON.stringify({
+                                    action: 'acknowledge'
+                                }),
+                                contentType: 'text/plain',
+                                error: function () {},
+                                success: function (data) {
+                                    $("#methodStatus").hide();
+                                    console.log("Details: " + JSON.stringify(data));
+                                }
+                            });
+                        });
+
                         $("#methodStatus").show();
                     }
                 }
