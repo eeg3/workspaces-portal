@@ -18,6 +18,7 @@ exports.handler = (event, context, callback) => {
 
     var originURL = process.env.ORIGIN_URL || '*'; // Origin URL to allow for CORS
     var stateMachine = process.env.STATE_MACHINE_ARN || 'arn:aws:states:us-east-1:375301133253:stateMachine:PromotionApproval'; // State Machine for 'create' action.
+    var detailsLambda = process.env.DETAILS_LAMBDA || 'wsp-db-int-serverless-stack-workspacesDetails-1J4ZB3URZF2QP';
 
     console.log('Received event:', JSON.stringify(event, null, 2)); // Output log for debugging purposes.
 
@@ -90,8 +91,6 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "details") {
-        var detailsLambda = process.env.DETAILS_LAMBDA || 'wsp-db-int-serverless-stack-workspacesDetails-1J4ZB3URZF2QP';
-
         var payloadString = JSON.stringify({
             "action": "get",
             "requesterEmailAddress": event.requestContext.authorizer.claims.email
@@ -114,6 +113,42 @@ exports.handler = (event, context, callback) => {
                 for (var i = 0; i < JSON.parse(data.Payload).length; i++) {
                     console.log("Username #" + i + ": " + JSON.parse(data.Payload)[i].Username.S)
                 }
+
+                callback(null, {
+                    "statusCode": 200,
+                    "body": data.Payload,
+                    "headers": {
+                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                        "Access-Control-Allow-Origin": originURL
+                    }
+                });
+
+            }
+        });
+
+    } else if (action == "cancel") {
+        // Placeholder to cancel WorkSpace creation request.
+    } else if (action == "acknowledge") { 
+        var payloadString = JSON.stringify({
+            "action": "put",
+            "requesterEmailAddress": "earl@eeg3.net", //event.requestContext.authorizer.claims.email,
+            "requesterUsername": "earltest", //JSON.parse(event.body)["username"],
+            "ws_status": ""
+        });
+
+        var ackParams = {
+            FunctionName: detailsLambda,
+            Payload: JSON.stringify({
+                "body": payloadString
+            })
+        };
+
+        lambda.invoke(ackParams, function (err, data) {
+            if (err) {
+                console.log(err, err.stack);
+            } else {
+                console.log("Data: " + JSON.stringify(data));
 
                 callback(null, {
                     "statusCode": 200,
