@@ -68,11 +68,13 @@ var authToken;
             }),
             contentType: 'text/plain',
             error: function () {
+                $("methodStatus").removeClass();
                 $("#methodStatus").addClass("alert-danger");
                 $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
                 $("#methodStatus").show();
             },
             success: function (data) {
+                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-success");
                 $("#methodStatus").html("<b>Success! WorkSpace request submitted...</b> This request must be approved before the WorkSpace will be created. An email has been sent to <b>" + _config.approval.email + "</b> to authorize this request. Once approved, the WorkSpace will be created automatically and an email will be sent to your email with instructions for access.");
                 $("#methodStatus").show();
@@ -99,11 +101,13 @@ var authToken;
             }),
             contentType: 'text/plain',
             error: function () {
+                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-danger");
                 $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
                 $("#methodStatus").show();
             },
             success: function (data) {
+                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-success");
                 $("#methodStatus").html("<b>Success! WorkSpace reboot in-progress...</b> Please allow up to 5 minutes for the virtual desktop to be fully rebooted.")
                 $("#methodStatus").show();
@@ -133,11 +137,13 @@ var authToken;
             }),
             contentType: 'text/plain',
             error: function () {
+                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-danger");
                 $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
                 $("#methodStatus").show();
             },
             success: function (data) {
+                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-success");
                 $("#methodStatus").html("<b>Success! WorkSpace rebuild in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully rebuilt. Once complete, an email will be sent with details.")
                 $("#methodStatus").show();
@@ -182,11 +188,13 @@ var authToken;
             }),
             contentType: 'text/plain',
             error: function () {
+                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-danger");
                 $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
                 $("#methodStatus").show();
             },
             success: function (data) {
+                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-success");
                 $("#methodStatus").html("<b>Success! WorkSpace removal in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully removed.")
                 $("#methodStatus").show();
@@ -194,6 +202,14 @@ var authToken;
                     location.reload();
                 }, 60000);
             }
+        });
+    }
+
+    function clearAlerts(elementName) {
+        var alerts = ["alert-success", "alert-danger", "alert-warning"];
+
+        alerts.forEach(function(item) {
+            $(elementName).removeClass(item);
         });
     }
 
@@ -219,7 +235,25 @@ var authToken;
 
             },
             success: function (data) {
-                console.log("Details: " + data)
+
+                console.log("Details: " + JSON.stringify(data));
+
+                for (var i = 0; i < data.length; i++) {
+                    console.log("WS_Status: " + data[i].WS_Status.S);
+                    if (data[i].WS_Status.S == "Requested") {
+                        clearAlerts("#methodStatus");
+                        $("#methodStatus").addClass("alert-warning");
+                        $("#methodMessage").html("Desktop pending approval.");
+                        $("#methodCommand").html('<button id="cancelRequest" class="btn btn-primary">Cancel Request</button>');
+                        $("#methodStatus").show();
+                    } else if (data[i].WS_Status.S == "Rejected") {
+                        clearAlerts("#methodStatus");
+                        $("#methodStatus").addClass("alert-danger");
+                        $("#methodMessage").html("Desktop request rejected.");
+                        $("#methodCommand").html('<button id="acknowledgeReject" class="btn btn-primary">Acknowledge</button>');
+                        $("#methodStatus").show();
+                    }
+                }
             }
         });
 
