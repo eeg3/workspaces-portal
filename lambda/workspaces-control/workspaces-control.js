@@ -132,8 +132,8 @@ exports.handler = (event, context, callback) => {
     } else if (action == "acknowledge") { 
         var payloadString = JSON.stringify({
             "action": "put",
-            "requesterEmailAddress": "earl@eeg3.net", //event.requestContext.authorizer.claims.email,
-            "requesterUsername": "earltest", //JSON.parse(event.body)["username"],
+            "requesterEmailAddress": event.requestContext.authorizer.claims.email,
+            "requesterUsername": JSON.parse(event.body)["username"],
             "ws_status": "Acknowledged"
         });
 
