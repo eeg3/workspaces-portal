@@ -2,7 +2,7 @@
 
 var Dashboard = window.Dashboard || {};
 var authToken;
-var currentUser;
+//var currentUser;
 
 (function ($) {
 
@@ -53,15 +53,11 @@ var currentUser;
             }),
             contentType: 'text/plain',
             error: function () {
-                $("methodStatus").removeClass();
-                $("#methodStatus").addClass("alert-danger");
-                $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
+                $("#methodStatus").append('<div class="alert alert-danger"><b>Error! Something went wrong... Please contact an administrator if the problem persists.</div>');
                 $("#methodStatus").show();
             },
             success: function (data) {
-                clearAlerts("#methodStatus");
-                $("#methodStatus").addClass("alert-success");
-                $("#methodStatus").html("<b>Success! WorkSpace request submitted...</b> This request must be approved before the WorkSpace will be created. An email has been sent to <b>" + _config.approval.email + "</b> to authorize this request. Once approved, the WorkSpace will be created automatically and an email will be sent to your email with instructions for access.");
+                $("#methodStatus").append('<div class="alert alert-success"><b>Success! WorkSpace request submitted...</b> This request must be approved before the WorkSpace will be created. An email has been sent to <b>' + _config.approval.email + '</b> to authorize this request. Once approved, the WorkSpace will be created automatically and an email will be sent to your email with instructions for access.</div>');
                 $("#methodStatus").show();
             }
         });
@@ -86,13 +82,11 @@ var currentUser;
             }),
             contentType: 'text/plain',
             error: function () {
-                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-danger");
                 $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
                 $("#methodStatus").show();
             },
             success: function (data) {
-                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-success");
                 $("#methodStatus").html("<b>Success! WorkSpace reboot in-progress...</b> Please allow up to 5 minutes for the virtual desktop to be fully rebooted.")
                 $("#methodStatus").show();
@@ -122,13 +116,11 @@ var currentUser;
             }),
             contentType: 'text/plain',
             error: function () {
-                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-danger");
                 $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
                 $("#methodStatus").show();
             },
             success: function (data) {
-                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-success");
                 $("#methodStatus").html("<b>Success! WorkSpace rebuild in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully rebuilt. Once complete, an email will be sent with details.")
                 $("#methodStatus").show();
@@ -173,13 +165,11 @@ var currentUser;
             }),
             contentType: 'text/plain',
             error: function () {
-                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-danger");
                 $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
                 $("#methodStatus").show();
             },
             success: function (data) {
-                clearAlerts("#methodStatus");
                 $("#methodStatus").addClass("alert-success");
                 $("#methodStatus").html("<b>Success! WorkSpace removal in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully removed.")
                 $("#methodStatus").show();
@@ -187,14 +177,6 @@ var currentUser;
                     location.reload();
                 }, 60000);
             }
-        });
-    }
-
-    function clearAlerts(elementName) {
-        var alerts = ["alert-success", "alert-danger", "alert-warning"];
-
-        alerts.forEach(function (item) {
-            $(elementName).removeClass(item);
         });
     }
 
@@ -289,20 +271,22 @@ var currentUser;
             },
             success: function (data) {
 
+                // Change this from modifying to adding the div instead so it can handle multiple
+                // Also change each update to say what user its for
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].WS_Status.S == "Requested") {
-                        clearAlerts("#methodStatus");
-                        $("#methodStatus").addClass("alert-warning");
-                        $("#methodMessage").html("WorkSpace pending approval.");
+                        $("#methodStatus").append('<div class="alert alert-warning"><div class="row"><div class="col-sm-6"><div class="methodMessage">WorkSpace approval pending for user: <b>' + data[i].Username.S + '</b></div></div><div class="col-sm-3"></div><div class="col-sm-3"><div class="methodCommand"></div></div></div></div>');
+                        //$("#methodStatus").addClass("alert-warning");
+                        //$("#methodMessage").html("WorkSpace pending approval.");
                         $("#methodStatus").show();
                     } else if (data[i].WS_Status.S == "Rejected") {
-                        clearAlerts("#methodStatus");
-                        $("#methodStatus").addClass("alert-danger");
-                        $("#methodMessage").html("WorkSpace request rejected.");
-                        $("#methodCommand").html('<button id="acknowledgeReject" class="btn btn-primary">Acknowledge</button>');
-                        currentUser = data[i].Username.S;
+                        $("#methodStatus").append('<div class="alert alert-danger"><div class="row"><div class="col-sm-6"><div class="methodMessage">WorkSpace request rejected for user: <b>' + data[i].Username.S + '</b></div></div><div class="col-sm-3"></div><div class="col-sm-3"><div class="methodCommand"><button id="acknowledgeReject-' + data[i].Username.S + '" class="btn btn-primary">Acknowledge</button></div></div></div></div>');
+                        //$("#methodStatus").addClass("alert-danger");
+                        //$("#methodMessage").html("WorkSpace request rejected.");
+                        //$("#methodCommand").html('<button id="acknowledgeReject" class="btn btn-primary">Acknowledge</button>');
+                        //currentUser = data[i].Username.S;
 
-                        $("#acknowledgeReject").on('click', function () {
+                        $("#acknowledgeReject-" + data[i].Username.S).on('click', function () {
                             $.ajax({
                                 method: 'POST',
                                 url: WORKSPACES_CONTROL_URL,
@@ -313,12 +297,12 @@ var currentUser;
                                 complete: function () {},
                                 data: JSON.stringify({
                                     action: 'acknowledge',
-                                    username: currentUser
+                                    username: this.id.split("-")[1]
                                 }),
                                 contentType: 'text/plain',
                                 error: function () {},
                                 success: function (data) {
-                                    $("#methodStatus").hide();
+                                    location.reload();
                                 }
                             });
                         });

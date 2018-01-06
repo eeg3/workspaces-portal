@@ -44,11 +44,11 @@ body {
     cursor: pointer;
 }
 
-#methodMessage {
+.methodMessage {
   text-align: left;
   margin-top: 6px;
 }
 
-#methodCommand {
+.methodCommand {
   text-align: right;
 }
