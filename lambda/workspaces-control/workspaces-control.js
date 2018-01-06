@@ -11,14 +11,18 @@ var workspaces = new AWS.WorkSpaces({
 // Create the Step Functions service object
 var stepfunctions = new AWS.StepFunctions();
 
+// Create the Lambda service object
+var lambda = new AWS.Lambda();
+
 exports.handler = (event, context, callback) => {
 
     var originURL = process.env.ORIGIN_URL || '*'; // Origin URL to allow for CORS
     var stateMachine = process.env.STATE_MACHINE_ARN || 'arn:aws:states:us-east-1:375301133253:stateMachine:PromotionApproval'; // State Machine for 'create' action.
+    var detailsLambda = process.env.DETAILS_LAMBDA || 'wsp-db-int-serverless-stack-workspacesDetails-1J4ZB3URZF2QP';
 
     console.log('Received event:', JSON.stringify(event, null, 2)); // Output log for debugging purposes.
 
-    // The 'action' parameter specifies what workspaces control should do. Accepted values: list, create, rebuild, reboot, delete, bundles.
+    // The 'action' parameter specifies what workspaces control should do. Accepted values: list, acknowledge, create, rebuild, reboot, delete, bundles.
     var action = JSON.parse(event.body)["action"];
     console.log("action: " + action);
 
@@ -64,7 +68,6 @@ exports.handler = (event, context, callback) => {
                                         if (err) {
                                             console.log(err, err.stack);
                                         } else {
-                                            console.log("Finally: " + data);
                                             callback(null, {
                                                 "statusCode": 200,
                                                 "body": JSON.stringify(data.Workspaces[0]),
@@ -87,6 +90,78 @@ exports.handler = (event, context, callback) => {
             }
         });
 
+    } else if (action == "details") {
+        var payloadString = JSON.stringify({
+            "action": "get",
+            "requesterEmailAddress": event.requestContext.authorizer.claims.email
+        });
+        var detailsParams = {
+            FunctionName: detailsLambda,
+            Payload: JSON.stringify({
+                "body": payloadString
+            })
+        };
+
+        lambda.invoke(detailsParams, function (err, data) {
+            if (err) {
+                console.log(err, err.stack);
+            } else {
+                console.log("Data: " + JSON.stringify(data));
+
+                console.log("Payload: " + data.Payload);
+
+                for (var i = 0; i < JSON.parse(data.Payload).length; i++) {
+                    console.log("Username #" + i + ": " + JSON.parse(data.Payload)[i].Username.S)
+                }
+
+                callback(null, {
+                    "statusCode": 200,
+                    "body": data.Payload,
+                    "headers": {
+                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                        "Access-Control-Allow-Origin": originURL
+                    }
+                });
+
+            }
+        });
+
+
+    } else if (action == "acknowledge") { 
+        var payloadString = JSON.stringify({
+            "action": "put",
+            "requesterEmailAddress": event.requestContext.authorizer.claims.email,
+            "requesterUsername": JSON.parse(event.body)["username"],
+            "ws_status": "Acknowledged"
+        });
+
+        var ackParams = {
+            FunctionName: detailsLambda,
+            Payload: JSON.stringify({
+                "body": payloadString
+            })
+        };
+
+        lambda.invoke(ackParams, function (err, data) {
+            if (err) {
+                console.log(err, err.stack);
+            } else {
+                console.log("Data: " + JSON.stringify(data));
+
+                callback(null, {
+                    "statusCode": 200,
+                    "body": data.Payload,
+                    "headers": {
+                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                        "Access-Control-Allow-Origin": originURL
+                    }
+                });
+
+            }
+        });
+
     } else if (action == "create") {
         // 'create' handles creation by initiating the Step Functions State Machine. The State Machine first sends an email
         // to the configured Approver email address with two links: one to approve and one to decline. If the Approver declines, 
@@ -97,9 +172,11 @@ exports.handler = (event, context, callback) => {
             stateMachineArn: stateMachine,
             /* required */
             input: JSON.stringify({
+                "action": "put",
                 "requesterEmailAddress": event.requestContext.authorizer.claims.email,
                 "requesterUsername": JSON.parse(event.body)["username"],
-                "requesterBundle": JSON.parse(event.body)["bundle"]
+                "requesterBundle": JSON.parse(event.body)["bundle"],
+                "ws_status": "Requested"
             })
         };
         stepfunctions.startExecution(stepParams, function (err, data) {

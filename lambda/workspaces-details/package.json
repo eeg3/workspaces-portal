@@ -1,0 +1,14 @@
+{
+  "name": "workspaces-details",
+  "version": "1.0.0",
+  "description": "Write WorkSpace details to DynamoDB.",
+  "main": "workspaces-details.js",
+  "scripts": {
+    "test": "lambda-local -l workspaces-details.js -e sample_events/se-workspaces-details-GET.js"
+  },
+  "author": "Earl Gay",
+  "license": "BSD-2-Clause",
+  "dependencies": {
+    "aws-sdk": "^2.176.0"
+  }
+}

@@ -43,3 +43,12 @@ body {
     font: inherit;
     cursor: pointer;
 }
+
+.methodMessage {
+  text-align: left;
+  margin-top: 6px;
+}
+
+.methodCommand {
+  text-align: right;
+}

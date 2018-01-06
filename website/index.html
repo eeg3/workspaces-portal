@@ -15,17 +15,23 @@ layout: default
   </p>
   <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-primary">View Source Code</a>
 </div>
-<div class="row">
-  <div class="col-sm-12">
-    <div id="methodStatus" class="alert" role="alert"></div>
+<div id="methodStatus" class="alert" role="alert">
+  <div class="row">
+    <div class="col-sm-12">
+      <div id="methodMessage" class="col-sm-3"></div>
+      <div class="col-sm-6"></div>
+      <div id="methodCommand" class="col-sm-3"></div>
+    </div>
   </div>
 </div>
-<div id="loadDiv" class="row"><!-- Show a loading div before AJAX call, and hide it after. -->
+<div id="loadDiv" class="row">
+  <!-- Show a loading div before AJAX call, and hide it after. -->
   <div class="col-sm-12">
     <img src="/images/ajax_loader_gray_32.gif">
   </div>
 </div>
-<div class="row" id="desktopNoExist"> <!-- If no provisioned desktop exists for the user, show the request panel. -->
+<div class="row" id="desktopNoExist">
+  <!-- If no provisioned desktop exists for the user, show the request panel. -->
   <div class="col-sm-6 col-sm-offset-3">
 
     <div class="panel panel-primary">
@@ -38,11 +44,12 @@ layout: default
             <input id="reqUsername" placeholder="Directory Username" type="text" maxlength="20" value="" required />
           </div>
           <div>
-        
-            <select id="reqBundle" /> <!-- Populated based on Bundles available. -->
-            
+
+            <select id="reqBundle" />
+            <!-- Populated based on Bundles available. -->
+
             </select>
-            
+
           </div>
           <br>
           <div>
@@ -56,11 +63,17 @@ layout: default
     </div>
   </div>
 </div>
-<div class="row" id="desktopExist"> <!-- If a provisioned desktop does exist for the user, show the control panel for the desktop. -->
+<div class="row" id="desktopExist">
+  <!-- If a provisioned desktop does exist for the user, show the control panel for the desktop. -->
   <div class="col-sm-9">
     <div class="panel panel-primary">
       <div class="panel-heading">
-        <h3 class="panel-title">WorkSpace Details <button id="reloadButton"><i class="fa fa-refresh" aria-hidden="true"></i></button></i></h3>
+        <h3 class="panel-title">WorkSpace Details
+          <button id="reloadButton">
+            <i class="fa fa-refresh" aria-hidden="true"></i>
+          </button>
+          </i>
+        </h3>
       </div>
       <div class="panel-body">
         <table id="workspacesTable" class="table table-bordered table-hover">
@@ -127,7 +140,8 @@ layout: default
         <h4 class="modal-title">WARNING: Delete WorkSpace</h4>
       </div>
       <div class="modal-body">
-        <p>This will <b>permanently</b> delete your WorkSpace. All data will be lost and unrecoverable!</p>
+        <p>This will
+          <b>permanently</b> delete your WorkSpace. All data will be lost and unrecoverable!</p>
       </div>
       <div class="modal-footer">
         <form id="confirmDecommissionWorkSpace" method="post" action="#">

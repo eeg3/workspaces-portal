@@ -29,7 +29,7 @@
         "DirectoryServicesId": {
             "Type": "String",
             "Description": "Directory Services ID configured within Amazon WorkSpaces.",
-            "Default": "d-90672a878e"
+            "Default": "d-9267276f54"
         },
         "ApprovedDomain": {
             "Type": "String",
@@ -59,7 +59,8 @@
                 "Handler": "workspaces-control.handler",
                 "Runtime": "nodejs4.3",
                 "CodeUri": "./lambda/workspaces-control/",
-                "Policies": ["AmazonWorkSpacesAdmin", "AWSStepFunctionsFullAccess"],
+                "Timeout": 5,
+                "Policies": ["AmazonWorkSpacesAdmin", "AWSStepFunctionsFullAccess", "AWSLambdaRole"],
                 "Environment": {
                     "Variables": {
                         "ORIGIN_URL": {
@@ -67,6 +68,9 @@
                         },
                         "STATE_MACHINE_ARN": {
                             "Ref": "approvalStateMachine"
+                        },
+                        "DETAILS_LAMBDA": {
+                            "Ref": "workspacesDetails"
                         }
                     }
                 }
@@ -119,7 +123,27 @@
                     "Timer": {
                         "Type": "Schedule",
                         "Properties": {
-                            "Schedule": "rate(10 minutes)"
+                            "Schedule": "rate(5 minutes)"
+                        }
+                    }
+                }
+            }
+        },
+        "workspacesDetails": {
+            "Type": "AWS::Serverless::Function",
+            "DependsOn": "WorkspaceDetailsTable",
+            "Properties": {
+                "Handler": "workspaces-details.handler",
+                "Runtime": "nodejs4.3",
+                "CodeUri": "./lambda/workspaces-details/",
+                "Policies": "AmazonDynamoDBFullAccess",
+                "Environment": {
+                    "Variables": {
+                        "ORIGIN_URL": {
+                            "Ref": "OriginUrl"
+                        },
+                        "DETAILS_TABLE_NAME": {
+                            "Ref": "WorkspaceDetailsTable"
                         }
                     }
                 }
@@ -152,6 +176,9 @@
                             "Action": "lambda:InvokeFunction",
                             "Resource": [{
                                 "Fn::GetAtt": ["workspacesCreate", "Arn"]
+                            },
+                            {
+                                "Fn::GetAtt": ["workspacesDetails", "Arn"]
                             }]
                         }]
                     }
@@ -194,21 +221,28 @@
                     "Fn::Sub": "${AppName}-StateMachine"
                 },
                 "DefinitionString": {
-                    "Fn::Join": ["", ["{\"StartAt\": \"approvalManualActivity\",\"States\": {\"approvalManualActivity\": {\"Type\": \"Task\",\"Resource\": \"",
+                    "Fn::Join": ["", ["{ \"StartAt\": \"WorkspaceApproval\", \"States\": { \"WorkspaceApproval\": { \"Type\": \"Parallel\", \"Branches\": [{ \"StartAt\": \"approvalManualActivity\", \"States\": { \"approvalManualActivity\": { \"Type\": \"Task\", \"Resource\": \"",
                         {
                             "Ref": "approvalManualActivity"
                         },
-                        "\",\"TimeoutSeconds\": 3600,\"Next\": \"workspacesCreate\"},\"workspacesCreate\": {\"Type\": \"Task\",\"Resource\": \"",
+                        "\", \"TimeoutSeconds\": 3600, \"Catch\": [{ \"ErrorEquals\": [\"States.TaskFailed\"], \"Next\": \"updateFinalWSDetailStatus\" }], \"Next\": \"workspacesCreate\" }, \"workspacesCreate\": { \"Type\": \"Task\", \"Resource\": \"",
                         {
                             "Fn::GetAtt": ["workspacesCreate", "Arn"]
                         },
-                        "\",\"End\": true}}}"
+                        "\", \"Next\": \"updateFinalWSDetailStatus\" }, \"updateFinalWSDetailStatus\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Fn::GetAtt": ["workspacesDetails", "Arn"]
+                        },
+                        "\", \"End\": true } } }, { \"StartAt\": \"updateInitialWSDetailStatus\", \"States\": { \"updateInitialWSDetailStatus\": { \"Type\": \"Task\", \"Resource\": \"",
+                        {
+                            "Fn::GetAtt": ["workspacesDetails", "Arn"]
+                        },
+                        "\", \"End\": true } } }], \"End\": true } } }"
                     ]]
                 },
                 "RoleArn": {
                     "Fn::GetAtt": ["approvalStepFunctionsRole", "Arn"]
                 }
-
             }
         },
         "approvalResponderAPI": {
@@ -262,7 +296,7 @@
                                     "passthroughBehavior": "when_no_templates",
                                     "httpMethod": "POST",
                                     "requestTemplates": {
-                                        "application/json": "{\n   \"cause\": \"Reject link was clicked.\",\n   \"error\": \"Rejected\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
+                                        "application/json": "{\n   \"error\": \"Rejected\",\n   \"cause\": \"$input.params('requesterEmailAddress'),$input.params('requesterUsername')\",\n   \"taskToken\": \"$input.params('taskToken')\"\n}"
                                     },
                                     "type": "aws"
                                 }
@@ -414,6 +448,41 @@
                 "Description": "Respond Deployment",
                 "StageName": "respond"
             }
+        },
+        "WorkspaceDetailsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+                "AttributeDefinitions": [{
+                        "AttributeName": "Email",
+                        "AttributeType": "S"
+                    },
+                    {
+                        "AttributeName": "Username",
+                        "AttributeType": "S"
+                    }
+                ],
+                "KeySchema": [{
+                        "AttributeName": "Email",
+                        "KeyType": "HASH"
+                    },
+                    {
+                        "AttributeName": "Username",
+                        "KeyType": "RANGE"
+                    }
+                ],
+                "ProvisionedThroughput": {
+                    "ReadCapacityUnits": "5",
+                    "WriteCapacityUnits": "5"
+                }
+            }
+        }
+    },
+    "Outputs": {
+        "WorkspaceDetailsTable": {
+            "Value": {
+                "Ref": "WorkspaceDetailsTable"
+            },
+            "Description": "Table name for WorkSpace Details"
         }
     }
 }
