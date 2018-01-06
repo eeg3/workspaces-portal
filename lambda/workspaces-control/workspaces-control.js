@@ -22,7 +22,7 @@ exports.handler = (event, context, callback) => {
 
     console.log('Received event:', JSON.stringify(event, null, 2)); // Output log for debugging purposes.
 
-    // The 'action' parameter specifies what workspaces control should do. Accepted values: list, create, rebuild, reboot, delete, bundles.
+    // The 'action' parameter specifies what workspaces control should do. Accepted values: list, acknowledge, create, rebuild, reboot, delete, bundles.
     var action = JSON.parse(event.body)["action"];
     console.log("action: " + action);
 
@@ -127,8 +127,7 @@ exports.handler = (event, context, callback) => {
             }
         });
 
-    } else if (action == "cancel") {
-        // Placeholder to cancel WorkSpace creation request.
+
     } else if (action == "acknowledge") { 
         var payloadString = JSON.stringify({
             "action": "put",

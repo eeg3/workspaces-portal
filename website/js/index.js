@@ -26,22 +26,6 @@ var authToken;
     $("#desktopExist").hide();
     $("#confirmDecommissionModal").hide();
 
-    $(function onDocReady() {
-
-        // Hook up functions to forms' submit buttons.
-        $('#requestWorkSpace').submit(handleRequest);
-        $('#decommissionWorkSpace').submit(handleDecommission);
-        $('#confirmDecommissionWorkSpace').submit(handleConfirmDecommission);
-        $('#rebootWorkSpace').submit(handleReboot);
-        $('#rebuildWorkSpace').submit(handleRebuild);
-
-        // If there is a WorkSpace for the user, give the user a direct button to refresh status.
-        $("#reloadButton").on('click', function () {
-            location.reload();
-        });
-
-    });
-
     // The handleRequest function gets creation form input (username, bundle) and passes it to the Workspaces Control API.
     // Workspaces Control API handles the 'create' action by initiating a Step Function State Machine that requires Email Approval before creation.
     // The WorkSpace will be created with a tag of "SelfServiceManaged" set to the email address within the Cognito auth token. This is how the portal
@@ -213,73 +197,10 @@ var authToken;
         });
     }
 
-    $(function init() {
-
-        if (!_config.api.invokeUrl) { // Show this message if the Portal's API is not configured.
-            $('#noApiMessage').show();
-        }
-
-        $.ajax({
-            method: 'POST',
-            url: WORKSPACES_CONTROL_URL,
-            headers: {
-                Authorization: authToken
-            },
-            beforeSend: function () {},
-            complete: function () {},
-            data: JSON.stringify({
-                action: 'details'
-            }),
-            contentType: 'text/plain',
-            error: function () {
-
-            },
-            success: function (data) {
-
-                console.log("Details: " + JSON.stringify(data));
-
-                for (var i = 0; i < data.length; i++) {
-                    console.log("WS_Status: " + data[i].WS_Status.S);
-                    if (data[i].WS_Status.S == "Requested") {
-                        clearAlerts("#methodStatus");
-                        $("#methodStatus").addClass("alert-warning");
-                        $("#methodMessage").html("Desktop pending approval.");
-                        $("#methodCommand").html('<button id="cancelRequest" class="btn btn-primary">Cancel Request</button>');
-                        $("#methodStatus").show();
-                    } else if (data[i].WS_Status.S == "Rejected") {
-                        clearAlerts("#methodStatus");
-                        $("#methodStatus").addClass("alert-danger");
-                        $("#methodMessage").html("Desktop request rejected.");
-                        $("#methodCommand").html('<button id="acknowledgeReject" class="btn btn-primary">Acknowledge</button>');
-
-                        $("#acknowledgeReject").on('click', function () {
-                            $.ajax({
-                                method: 'POST',
-                                url: WORKSPACES_CONTROL_URL,
-                                headers: {
-                                    Authorization: authToken
-                                },
-                                beforeSend: function () {},
-                                complete: function () {},
-                                data: JSON.stringify({
-                                    action: 'acknowledge'
-                                }),
-                                contentType: 'text/plain',
-                                error: function () {},
-                                success: function (data) {
-                                    $("#methodStatus").hide();
-                                    console.log("Details: " + JSON.stringify(data));
-                                }
-                            });
-                        });
-
-                        $("#methodStatus").show();
-                    }
-                }
-            }
-        });
-
-
+    // The determineWorkspace function is called to get details of the assigned WorkSpace, and populate the WorkSpace details and action panes. In the event
+    // there is no WorkSpace found,  populate the list of bundles available and allow the user to request one. The function takes an optional eventSource
+    // parameter to handle recursion if necessary to avoid an initial bundle listing edge case.
+    function determineWorkspace(eventSource) {
         $.ajax({
             method: 'POST',
             url: WORKSPACES_CONTROL_URL,
@@ -314,11 +235,15 @@ var authToken;
                     }),
                     contentType: 'text/plain',
                     error: function () {
-                        $('#reqBundle')
-                            .append($("<option></option>")
-                                .attr("value", "error")
-                                .text("ERROR: No bundles found."));
-                        $("#desktopNoExist").show(); // If no WorkSpace is returned, show the request panel.
+                        if (eventSource == "init") {
+                            determineWorkspace("recursive");
+                        } else {
+                            $('#reqBundle')
+                                .append($("<option></option>")
+                                    .attr("value", "error")
+                                    .text("ERROR: No bundles found."));
+                            $("#desktopNoExist").show(); // If no WorkSpace is returned, show the request panel.
+                        }
                     },
                     success: function (data) {
                         for (var i = 0; i < data.Result.length; i++) {
@@ -340,6 +265,98 @@ var authToken;
                 $("#desktopExist").show();
             }
         });
+    }
+
+    // the determineWorkflowStatus function is called to get the status details on the creation request. If the request is pending approval, the user is 
+    // notified of such. If the request is rejected, the user is notified of such until they acknowledge. If this request is approved or doesn't exist, 
+    // then nothing is displayed.      
+    function determineWorkflowStatus() {
+        $.ajax({
+            method: 'POST',
+            url: WORKSPACES_CONTROL_URL,
+            headers: {
+                Authorization: authToken
+            },
+            beforeSend: function () {},
+            complete: function () {},
+            data: JSON.stringify({
+                action: 'details'
+            }),
+            contentType: 'text/plain',
+            error: function () {
+
+            },
+            success: function (data) {
+
+                console.log("Details: " + JSON.stringify(data));
+
+                for (var i = 0; i < data.length; i++) {
+                    console.log("WS_Status: " + data[i].WS_Status.S);
+                    if (data[i].WS_Status.S == "Requested") {
+                        clearAlerts("#methodStatus");
+                        $("#methodStatus").addClass("alert-warning");
+                        $("#methodMessage").html("WorkSpace pending approval.");
+                        $("#methodCommand").html('<button id="cancelRequest" class="btn btn-primary">Cancel Request</button>');
+                        $("#methodStatus").show();
+                    } else if (data[i].WS_Status.S == "Rejected") {
+                        clearAlerts("#methodStatus");
+                        $("#methodStatus").addClass("alert-danger");
+                        $("#methodMessage").html("WorkSpace request rejected.");
+                        $("#methodCommand").html('<button id="acknowledgeReject" class="btn btn-primary">Acknowledge</button>');
+
+                        $("#acknowledgeReject").on('click', function () {
+                            $.ajax({
+                                method: 'POST',
+                                url: WORKSPACES_CONTROL_URL,
+                                headers: {
+                                    Authorization: authToken
+                                },
+                                beforeSend: function () {},
+                                complete: function () {},
+                                data: JSON.stringify({
+                                    action: 'acknowledge'
+                                }),
+                                contentType: 'text/plain',
+                                error: function () {},
+                                success: function (data) {
+                                    $("#methodStatus").hide();
+                                    console.log("Details: " + JSON.stringify(data));
+                                }
+                            });
+                        });
+
+                        $("#methodStatus").show();
+                    }
+                }
+            }
+        });
+    }
+
+    $(function init() {
+
+        if (!_config.api.invokeUrl) { // Show this message if the Portal's API is not configured.
+            $('#noApiMessage').show();
+        }
+
+        determineWorkflowStatus(); // Determine if there is an active request, and notify user of status.
+        determineWorkspace("init"); // Determine if there is a WorkSpace assigned to the user, and if so then populate actions. If not, show the request div.
+
+    });
+
+    $(function onDocReady() {
+
+        // Hook up functions to forms' submit buttons.
+        $('#requestWorkSpace').submit(handleRequest);
+        $('#decommissionWorkSpace').submit(handleDecommission);
+        $('#confirmDecommissionWorkSpace').submit(handleConfirmDecommission);
+        $('#rebootWorkSpace').submit(handleReboot);
+        $('#rebuildWorkSpace').submit(handleRebuild);
+
+        // If there is a WorkSpace for the user, give the user a direct button to refresh status.
+        $("#reloadButton").on('click', function () {
+            location.reload();
+        });
+
     });
 
 }(jQuery));
