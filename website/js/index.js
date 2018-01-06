@@ -2,6 +2,7 @@
 
 var Dashboard = window.Dashboard || {};
 var authToken;
+var currentUser;
 
 (function ($) {
 
@@ -288,21 +289,18 @@ var authToken;
             },
             success: function (data) {
 
-                console.log("Details: " + JSON.stringify(data));
-
                 for (var i = 0; i < data.length; i++) {
-                    console.log("WS_Status: " + data[i].WS_Status.S);
                     if (data[i].WS_Status.S == "Requested") {
                         clearAlerts("#methodStatus");
                         $("#methodStatus").addClass("alert-warning");
                         $("#methodMessage").html("WorkSpace pending approval.");
-                        $("#methodCommand").html('<button id="cancelRequest" class="btn btn-primary">Cancel Request</button>');
                         $("#methodStatus").show();
                     } else if (data[i].WS_Status.S == "Rejected") {
                         clearAlerts("#methodStatus");
                         $("#methodStatus").addClass("alert-danger");
                         $("#methodMessage").html("WorkSpace request rejected.");
                         $("#methodCommand").html('<button id="acknowledgeReject" class="btn btn-primary">Acknowledge</button>');
+                        currentUser = data[i].Username.S;
 
                         $("#acknowledgeReject").on('click', function () {
                             $.ajax({
@@ -314,13 +312,13 @@ var authToken;
                                 beforeSend: function () {},
                                 complete: function () {},
                                 data: JSON.stringify({
-                                    action: 'acknowledge'
+                                    action: 'acknowledge',
+                                    username: currentUser
                                 }),
                                 contentType: 'text/plain',
                                 error: function () {},
                                 success: function (data) {
                                     $("#methodStatus").hide();
-                                    console.log("Details: " + JSON.stringify(data));
                                 }
                             });
                         });
