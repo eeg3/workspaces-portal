@@ -2,7 +2,6 @@
 
 var Dashboard = window.Dashboard || {};
 var authToken;
-//var currentUser;
 
 (function ($) {
 
@@ -271,20 +270,13 @@ var authToken;
             },
             success: function (data) {
 
-                // Change this from modifying to adding the div instead so it can handle multiple
-                // Also change each update to say what user its for
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].WS_Status.S == "Requested") {
                         $("#methodStatus").append('<div class="alert alert-warning"><div class="row"><div class="col-sm-6"><div class="methodMessage">WorkSpace approval pending for user: <b>' + data[i].Username.S + '</b></div></div><div class="col-sm-3"></div><div class="col-sm-3"><div class="methodCommand"></div></div></div></div>');
-                        //$("#methodStatus").addClass("alert-warning");
-                        //$("#methodMessage").html("WorkSpace pending approval.");
+
                         $("#methodStatus").show();
                     } else if (data[i].WS_Status.S == "Rejected") {
                         $("#methodStatus").append('<div class="alert alert-danger"><div class="row"><div class="col-sm-6"><div class="methodMessage">WorkSpace request rejected for user: <b>' + data[i].Username.S + '</b></div></div><div class="col-sm-3"></div><div class="col-sm-3"><div class="methodCommand"><button id="acknowledgeReject-' + data[i].Username.S + '" class="btn btn-primary">Acknowledge</button></div></div></div></div>');
-                        //$("#methodStatus").addClass("alert-danger");
-                        //$("#methodMessage").html("WorkSpace request rejected.");
-                        //$("#methodCommand").html('<button id="acknowledgeReject" class="btn btn-primary">Acknowledge</button>');
-                        //currentUser = data[i].Username.S;
 
                         $("#acknowledgeReject-" + data[i].Username.S).on('click', function () {
                             $.ajax({
