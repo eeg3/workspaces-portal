@@ -1,6 +1,6 @@
 {
     "AWSTemplateFormatVersion": "2010-09-09",
-    "Description": "Foundational Services for Serverless Pipeline",
+    "Description": "WorkSpaces Portal Foundational Services and Pipeline",
     "Parameters": {
         "AppName": {
             "Type": "String",
@@ -24,7 +24,7 @@
         "SAMInputFile": {
             "Type": "String",
             "Description": "The filename for the serverless transform file.",
-            "Default": "sam.json"
+            "Default": "wsportal.json"
         },
         "SAMOutputFile": {
             "Type": "String",

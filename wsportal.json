@@ -1,6 +1,6 @@
 {
     "Transform": "AWS::Serverless-2016-10-31",
-    "Description": "Serverless Stack",
+    "Description": "WorkSpaces Portal Application Stack",
     "Parameters": {
         "OriginUrl": {
             "Description": "The origin url to allow CORS requests from. This will be the base URL of the static website.",
@@ -29,7 +29,7 @@
         "DirectoryServicesId": {
             "Type": "String",
             "Description": "Directory Services ID configured within Amazon WorkSpaces.",
-            "Default": "d-9267276f54"
+            "Default": "d-90672a878e"
         },
         "ApprovedDomain": {
             "Type": "String",
@@ -42,7 +42,7 @@
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "cogDomainVerify.handler",
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs6.10",
                 "CodeUri": "./lambda/cognito-domainVerify/",
                 "Environment": {
                     "Variables": {
@@ -57,7 +57,7 @@
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "workspaces-control.handler",
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs6.10",
                 "CodeUri": "./lambda/workspaces-control/",
                 "Timeout": 5,
                 "Policies": ["AmazonWorkSpacesAdmin", "AWSStepFunctionsFullAccess", "AWSLambdaRole"],
@@ -80,7 +80,7 @@
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "workspaces-create.handler",
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs6.10",
                 "CodeUri": "./lambda/workspaces-create/",
                 "Policies": "AmazonWorkSpacesAdmin",
                 "Environment": {
@@ -99,7 +99,7 @@
             "Type": "AWS::Serverless::Function",
             "Properties": {
                 "Handler": "workspaces-approval.handler",
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs6.10",
                 "CodeUri": "./lambda/workspaces-approval/",
                 "Timeout": 75,
                 "Policies": "AdministratorAccess",
@@ -134,7 +134,7 @@
             "DependsOn": "WorkspaceDetailsTable",
             "Properties": {
                 "Handler": "workspaces-details.handler",
-                "Runtime": "nodejs4.3",
+                "Runtime": "nodejs6.10",
                 "CodeUri": "./lambda/workspaces-details/",
                 "Policies": "AmazonDynamoDBFullAccess",
                 "Environment": {
