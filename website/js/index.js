@@ -21,10 +21,13 @@ var authToken;
     });
 
     // Hide all of these panels by default, and show them as appropriate.
-    $("#methodStatus").hide();
     $("#desktopNoExist").hide();
     $("#desktopExist").hide();
+    $('#desktopNoExist').removeAttr('hidden');
+    $('#desktopExist').removeAttr('hidden');
+    $("#methodStatus").hide();
     $("#confirmDecommissionModal").hide();
+
 
     // The handleRequest function gets creation form input (username, bundle) and passes it to the Workspaces Control API.
     // Workspaces Control API handles the 'create' action by initiating a Step Function State Machine that requires Email Approval before creation.
@@ -82,12 +85,12 @@ var authToken;
             contentType: 'text/plain',
             error: function () {
                 $("#methodStatus").addClass("alert-danger");
-                $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
+                $("#methodStatus").html('<div class="alert alert-danger"><b>Error! Something went wrong... Please contact an administrator if the problem persists.</div>');
                 $("#methodStatus").show();
             },
             success: function (data) {
                 $("#methodStatus").addClass("alert-success");
-                $("#methodStatus").html("<b>Success! WorkSpace reboot in-progress...</b> Please allow up to 5 minutes for the virtual desktop to be fully rebooted.")
+                $("#methodStatus").html('<div class="alert alert-success"><b>Success! WorkSpace reboot in-progress...</b> Please allow up to 5 minutes for the virtual desktop to be fully rebooted.</div>');
                 $("#methodStatus").show();
                 setTimeout(function () {
                     location.reload();
@@ -116,12 +119,12 @@ var authToken;
             contentType: 'text/plain',
             error: function () {
                 $("#methodStatus").addClass("alert-danger");
-                $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
+                $("#methodStatus").html('<div class="alert alert-danger"><b>Error! Something went wrong... Please contact an administrator if the problem persists.</div>');
                 $("#methodStatus").show();
             },
             success: function (data) {
                 $("#methodStatus").addClass("alert-success");
-                $("#methodStatus").html("<b>Success! WorkSpace rebuild in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully rebuilt. Once complete, an email will be sent with details.")
+                $("#methodStatus").html('<div class="alert alert-success"><b>Success! WorkSpace rebuild in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully rebuilt. Once complete, an email will be sent with details.</div>');
                 $("#methodStatus").show();
                 setTimeout(function () {
                     location.reload();
@@ -165,12 +168,12 @@ var authToken;
             contentType: 'text/plain',
             error: function () {
                 $("#methodStatus").addClass("alert-danger");
-                $("#methodStatus").html("<b>Error! Something went wrong... Please contact an administrator if the problem persists.")
+                $("#methodStatus").html('<div class="alert alert-danger"><b>Error! Something went wrong... Please contact an administrator if the problem persists.</div>');
                 $("#methodStatus").show();
             },
             success: function (data) {
                 $("#methodStatus").addClass("alert-success");
-                $("#methodStatus").html("<b>Success! WorkSpace removal in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully removed.")
+                $("#methodStatus").html('<div class="alert alert-success"><b>Success! WorkSpace removal in-progress...</b> Please allow up to 10 minutes for the virtual desktop to be fully removed.');
                 $("#methodStatus").show();
                 setTimeout(function () {
                     location.reload();
@@ -272,11 +275,11 @@ var authToken;
 
                 for (var i = 0; i < data.length; i++) {
                     if (data[i].WS_Status.S == "Requested") {
-                        $("#methodStatus").append('<div class="alert alert-warning"><div class="row"><div class="col-sm-6"><div class="methodMessage">WorkSpace approval pending for user: <b>' + data[i].Username.S + '</b></div></div><div class="col-sm-3"></div><div class="col-sm-3"><div class="methodCommand"></div></div></div></div>');
+                        $("#methodStatus").append('<div class="alert alert-warning"><div class="row"><div class="col-sm-6 ml-right"><div class="methodMessage">WorkSpace approval pending for user: <b>' + data[i].Username.S + '</b></div></div><div class="col-sm-3 ml-auto"><div class="methodCommand"></div></div></div></div>');
 
                         $("#methodStatus").show();
                     } else if (data[i].WS_Status.S == "Rejected") {
-                        $("#methodStatus").append('<div class="alert alert-danger"><div class="row"><div class="col-sm-6"><div class="methodMessage">WorkSpace request rejected for user: <b>' + data[i].Username.S + '</b></div></div><div class="col-sm-3"></div><div class="col-sm-3"><div class="methodCommand"><button id="acknowledgeReject-' + data[i].Username.S + '" class="btn btn-primary">Acknowledge</button></div></div></div></div>');
+                        $("#methodStatus").append('<div class="alert alert-danger alert-dismissible fade show"><button id="acknowledgeReject-' + data[i].Username.S + '" class="close" data-dismiss="alert" type="button"><span>&times;</span></button>WorkSpace request rejected for user: <strong>' + data[i].Username.S + '</strong></div>');
 
                         $("#acknowledgeReject-" + data[i].Username.S).on('click', function () {
                             $.ajax({

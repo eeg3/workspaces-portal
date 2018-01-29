@@ -5,57 +5,49 @@ layout: default
 
 <!-- Main jumbotron -->
 <div class="jumbotron">
-  <h1>{{page.title}}</h1>
+  <h1 class="display-4">
+    <strong>{{page.title}}</strong>
+  </h1>
 
-  <p>
+  <p class="lead">
     Authentication for this site uses AWS
     <a href="https://aws.amazon.com/cognito/">Cognito</a> in order to provide access through the
     <a href="https://aws.amazon.com/api-gateway/">API Gateway</a> powering the
-    <a href="https://aws.amazon.com/lambda/">Lambda</a> functions with the site's dynamic content.
+    <a href="https://aws.amazon.com/lambda/">Lambda</a> functions with the site's dynamic content. The documentation (i.e. setup instructions, modification details)
+    and full source code for this site as well as the pipeline that powers it is available within the GitHub repository.
   </p>
-  <p>
-    The documentation (i.e. setup instructions, modification details) and full source code for this site as well as the pipeline
-    that powers it is available within the GitHub repository.
-  </p>
-  <a href="https://github.com/eeg3/serverless-pipeline" class="btn btn-primary">View Source Code</a>
-  </p>
+  <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-outline-primary">View Source Code</a>
 </div>
 
-<div class="page-header">
-  <h1>Verification</h1>
-</div>
+
+
 <div class="row">
-  <div class="col-sm-4 col-sm-offset-4">
-
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">Verify Code</h3>
+  <div class="col-md-8 col-lg-6 mr-auto ml-auto">
+    <div class="card border-dark">
+      <div class="card-header bg-primary text-white">
+        Verification
       </div>
-      <div class="panel-body">
-        <form id="verifyForm">
-          <input type="email" id="emailInputVerify" placeholder="Email" required>
-          <br />
-          <input type="text" id="codeInputVerify" placeholder="Verification Code" pattern=".*" required>
-          <br />
-          <br />
-          <input type="submit" value="Verify">
-        </form>
+      <div class="card-body">
+        <h5 class="card-subtitle mb-2">Verify Code</h4>
+          <form id="registrationForm">
+            <div class="form-group">
+              <input type="email" id="emailInputVerify" class="form-control form-control-sm" placeholder="Email Address" pattern=".*" required>
+              <input type="text" id="codeInputVerify" class="form-control form-control-sm" placeholder="Verification Code" pattern=".*"
+                required>
+            </div>
+            <input class="btn btn-outline-primary" type="submit" value="Verify">
+          </form>
       </div>
     </div>
   </div>
-  <!-- /.col-sm-4 -->
-
 </div>
 
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 
-<!-- Bootstrap core JavaScript
-    ================================================== -->
-<!-- Placed at the end of the document so the pages load faster -->
-<script src="/js/vendor/jquery-3.1.0.js"></script>
-<script src="/js/vendor/bootstrap.min.js"></script>
-<script src="/js/vendor/docs.min.js"></script>
-<!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-<script src="/js/vendor/ie10-viewport-bug-workaround.js"></script>
+<!-- Bootstrap JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 
 <script src="js/vendor/aws-cognito-sdk.min.js"></script>
 <script src="js/vendor/amazon-cognito-identity.min.js"></script>

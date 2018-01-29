@@ -5,66 +5,128 @@ layout: default
 
 <!-- Main jumbotron -->
 <div class="jumbotron">
-  <h1>{{page.title}}</h1>
-  <p>
+  <h1 class="display-4">
+    <strong>{{page.title}}</strong>
+  </h1>
+
+  <p class="lead">
     Request, Reboot, Rebuild, and Decommission your Amazon WorkSpace.
   </p>
-  <p>
+  <p class="lead">
     The documentation (i.e. setup instructions, modification details) and full source code for this template as well as the pipeline
     that powers it is available within the GitHub repository.
   </p>
-  <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-primary">View Source Code</a>
+  <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-outline-primary">View Source Code</a>
+  </p>
 </div>
-<div id="methodStatus" class="alert" role="alert">
-  <div class="row">
-    <div class="col-sm-12">
-      <div id="methodMessage" class="col-sm-3"></div>
-      <div class="col-sm-6"></div>
-      <div id="methodCommand" class="col-sm-3"></div>
-    </div>
-  </div>
+
+<!-- Place alerts in this div. -->
+<div id="methodStatus">
 </div>
+
+<!-- Show a loading div before AJAX call, and hide it after. -->
 <div id="loadDiv" class="row">
-  <!-- Show a loading div before AJAX call, and hide it after. -->
   <div class="col-sm-12">
     <img src="/images/ajax_loader_gray_32.gif">
   </div>
 </div>
-<div class="row" id="desktopNoExist">
-  <!-- If no provisioned desktop exists for the user, show the request panel. -->
-  <div class="col-sm-6 col-sm-offset-3">
 
-    <div class="panel panel-primary">
-      <div class="panel-heading">
-        <h3 class="panel-title">Request WorkSpace</h3>
-      </div>
-      <div class="panel-body">
-        <form id="requestWorkSpace">
-          <div>
-            <input id="reqUsername" placeholder="Directory Username" type="text" maxlength="20" value="" required />
+<!-- If no provisioned desktop exists for the user, show the request panel. -->
+<div class="row" id="desktopNoExist" hidden>
+    <div class="col-md-8 col-lg-6 mr-auto ml-auto">
+        <div class="card border-dark">
+            <div class="card-header bg-primary text-white">
+              Request WorkSpace
+            </div>
+            <div class="card-body">
+              <p class="card-text">
+                  <form id="requestWorkSpace">
+                      <div>
+                        <input type="text" id="reqUsername" class="form-control form-control-sm" placeholder="Directory Username" required>
+
+                      </div>
+                      <div class="mt-1">
+                        <!-- Populated based on Bundles available. -->
+                        <select id="reqBundle" />
+                        </select>
+                      </div>
+                      <br>
+                      <div>
+                        <button id="reqButton" class="btn btn-primary" type="submit" name="submit">
+                          <span>Create WorkSpace</span>
+                          <i></i>
+                        </button>
+                      </div>
+                    </form>
+              </p>
+            </div>
           </div>
-          <div>
-
-            <select id="reqBundle" />
-            <!-- Populated based on Bundles available. -->
-
-            </select>
-
-          </div>
-          <br>
-          <div>
-            <button id="reqButton" type="submit" name="submit">
-              <span>Create WorkSpace</span>
-              <i></i>
-            </button>
-          </div>
-        </form>
-      </div>
     </div>
   </div>
-</div>
-<div class="row" id="desktopExist">
-  <!-- If a provisioned desktop does exist for the user, show the control panel for the desktop. -->
+
+
+  <div class="row" id="desktopExist" hidden>
+      <div class="col-sm-9 mr-auto ml-auto">
+          <div class="card border-dark">
+              <div class="card-header bg-primary text-white">
+                WorkSpace Details
+              </div>
+              <div class="card-body">
+                <p class="card-text">
+                    <table id="workspacesTable" class="table table-bordered table-hover">
+                        <thead>
+                          <tr>
+                            <th>WorkSpace ID</th>
+                            <th>Username</th>
+                            <th>State</th>
+                            <th>Bundle ID</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td id="workspace-Id"></td>
+                            <td id="workspace-Username"></td>
+                            <td id="workspace-State"></td>
+                            <td id="workspace-Bundle"></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                </p>
+              </div>
+            </div>
+      </div>
+      <div class="col-sm-3 mr-auto ml-auto">
+        <div class="card border-dark">
+          <div class="card-header bg-primary text-white">
+            WorkSpace Operations
+          </div>
+          <div class="card-body">
+                <form id="rebootWorkSpace" method="post" action="#">
+                    <button class="btn btn-sm btn-block btn-outline-primary" type="submit" name="submit">
+                      <span>Reboot WorkSpace</span>
+                      <i></i>
+                    </button>
+                  </form>
+                  <form id="rebuildWorkSpace" method="post" action="#">
+                    <button class="btn btn-sm btn-block btn-outline-primary" type="submit" name="submit">
+                      <span>Rebuild WorkSpace</span>
+                      <i></i>
+                    </button>
+                  </form>
+                  <form id="decommissionWorkSpace" method="post" action="#">
+                    <button class="btn btn-sm btn-block btn-outline-primary" type="submit" name="submit">
+                      <span>Delete WorkSpace</span>
+                      <i></i>
+                    </button>
+                  </form>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+<!-- If a provisioned desktop does exist for the user, show the control panel for the desktop. -->
+<div class="row" id="desktopExist2" hidden>
   <div class="col-sm-9">
     <div class="panel panel-primary">
       <div class="panel-heading">
@@ -130,38 +192,42 @@ layout: default
 
 
 <!-- WorkSpace Deletion Confirmation Modal -->
-<div id="confirmDecommissionModal" class="modal fade" role="dialog">
-  <div class="modal-dialog">
-
-    <!-- Modal content-->
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">WARNING: Delete WorkSpace</h4>
-      </div>
-      <div class="modal-body">
-        <p>This will
-          <b>permanently</b> delete your WorkSpace. All data will be lost and unrecoverable!</p>
-      </div>
-      <div class="modal-footer">
-        <form id="confirmDecommissionWorkSpace" method="post" action="#">
-          <button id="submit" type="submit" name="submit" class="btn btn-danger">
-            <span>Confirm Delete WorkSpace</span>
-            <i></i>
-          </button>
-        </form>
+<div class="modal" id="confirmDecommissionModal">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">WARNING: Delete WorkSpace</h5>
+          <button class="close" data-dismiss="modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <p>This will
+                <b>permanently</b> delete your WorkSpace. All data will be lost and unrecoverable!</p>
+        </div>
+        <div class="modal-footer">
+            <form id="confirmDecommissionWorkSpace" method="post" action="#">
+                <button id="submit" type="submit" name="submit" class="btn btn-danger">
+                  <span>Confirm Delete WorkSpace</span>
+                  <i></i>
+                </button>
+              </form>
+        </div>
       </div>
     </div>
-
   </div>
-</div>
 
 
-<script src="js/vendor/jquery-3.1.0.js"></script>
-<script src="js/vendor/bootstrap.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+  crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+  crossorigin="anonymous"></script>
+
 <script src="js/vendor/aws-cognito-sdk.min.js"></script>
 <script src="js/vendor/amazon-cognito-identity.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
+
 <script src="js/config.js"></script>
 <script src="js/cognito-auth.js"></script>
 <script src="js/index.js"></script>

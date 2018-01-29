@@ -5,47 +5,33 @@ layout: default
 
 <!-- Main jumbotron -->
 <div class="jumbotron">
-  <h1>{{page.title}}</h1>
+  <h1 class="display-4">
+    <strong>{{page.title}}</strong>
+  </h1>
 
-  <p>
-    This is a template showcasing the serverless model using AWS
-    <a href="https://aws.amazon.com/s3/">S3</a>,
-    <a href="https://aws.amazon.com/lambda/">Lambda</a>,
-    <a href="https://aws.amazon.com/cognito/">Cognito
-      <a>,
-        <a href="https://aws.amazon.com/iam/">IAM</a>, and
-        <a href="https://aws.amazon.com/api-gateway/">API Gateway</a>. The template also uses
-        <a href="https://getbootstrap.com/">Bootstrap</a> and
-        <a href="http://fontawesome.io/">FontAwesome</a>. The code is based on two sample projects by AWS Labs:
-        <a href="https://github.com/awslabs/aws-serverless-workshops/tree/master/WebApplication/">Serverless Web Application Workshop</a> and
-        <a href="https://github.com/awslabs/aws-serverless-samfarm">Serverless SAM Farm</a>.
+  <p class="lead">
+    Request, Reboot, Rebuild, and Decommission your Amazon WorkSpace.
   </p>
-  <p>
-    The documentation (i.e. setup instructions, modification details) and full source code for this site as well as the pipeline
+  <p class="lead">
+    The documentation (i.e. setup instructions, modification details) and full source code for this template as well as the pipeline
     that powers it is available within the GitHub repository.
   </p>
-  <a href="https://github.com/eeg3/serverless-pipeline" class="btn btn-primary">View Source Code</a>
+  <a href="https://github.com/eeg3/workspaces-portal" class="btn btn-outline-primary">View Source Code</a>
   </p>
 </div>
 
-<div class="page-header">
-  <h1>User Profile</h1>
-</div>
 <div class="row">
-  <div id="samfarm" class="col-sm-12">
-    <table>
-      <tr>
-        <td>Authentication Token: </td>
-        <td>
+  <div class="col-sm-12 mr-auto ml-auto">
+    <div class="card border-dark">
+      <div class="card-header bg-primary text-white">
+        User Profile
+      </div>
+      <div class="card-body text-center">
+        <h5 class="card-subtitle mb-2">Authentication Token</h4>
           <textarea class="authToken" cols="80" rows="3"></textarea>
-        </td>
-      </tr>
-    </table>
-
+      </div>
+    </div>
   </div>
-
-</div>
-
 </div>
 
 <div id="noApiMessage" class="configMessage" style="display: none;">
@@ -76,11 +62,15 @@ layout: default
   </div>
 </div>
 
-<script src="js/vendor/jquery-3.1.0.js"></script>
-<script src="js/vendor/bootstrap.min.js"></script>
+<!-- jQuery -->
+<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
+
+<!-- Bootstrap JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
 <script src="js/vendor/aws-cognito-sdk.min.js"></script>
 <script src="js/vendor/amazon-cognito-identity.min.js"></script>
-<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/phaser/2.6.2/phaser.min.js"></script>
 <script src="js/config.js"></script>
 <script src="js/cognito-auth.js"></script>
 <script src="js/profile.js"></script>
