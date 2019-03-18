@@ -1,6 +1,5 @@
 'use strict';
 
-// Load the AWS SDK for Node.js
 var AWS = require('aws-sdk');
 
 // Create the WorkSpaces service object
@@ -17,8 +16,8 @@ var lambda = new AWS.Lambda();
 exports.handler = (event, context, callback) => {
 
     var originURL = process.env.ORIGIN_URL || '*'; // Origin URL to allow for CORS
-    var stateMachine = process.env.STATE_MACHINE_ARN || 'arn:aws:states:us-east-1:375301133253:stateMachine:PromotionApproval'; // State Machine for 'create' action.
-    var detailsLambda = process.env.DETAILS_LAMBDA || 'wsp-db-int-serverless-stack-workspacesDetails-1J4ZB3URZF2QP';
+    var stateMachine = process.env.STATE_MACHINE_ARN || 'arn:aws:states:us-east-1:903195713680:stateMachine:wsPortal-StateMachine' ; // State Machine for 'create' action 'arn:aws:states:us-east-1:375301133253:stateMachine:PromotionApproval'.
+    var detailsLambda = process.env.DETAILS_LAMBDA  || 'wsp-db-int-serverless-stack-workspacesDetails-4WD7U26C6FVF' ;// 'wsp-db-int-serverless-stack-workspacesDetails-1J4ZB3URZF2QP';
 
     console.log('Received event:', JSON.stringify(event, null, 2)); // Output log for debugging purposes.
 
@@ -27,10 +26,10 @@ exports.handler = (event, context, callback) => {
     console.log("action: " + action);
 
     if (action == "list") {
-        // 'list' handles outputting the WorkSpace details assigned to the user that submits the API call. 
+        // 'list' handles outputting the WorkSpace details assigned to the user that submits the API call.
         // If no workspace is found, currently just responds with an error which is handled client-side.
 
-        // The 'email' value within the Cognito token is used to determine ownership, which is checked agaisnt the 'SelfServiceManaged' tag value.
+        // The 'email' value within the Cognito token is used to determine ownership, which is checked against the 'SelfServiceManaged' tag value.
         // The tag value is used for ownership detection in order to avoid integrating with Directory Services directly.
         console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
 
@@ -42,49 +41,69 @@ exports.handler = (event, context, callback) => {
             if (err) {
                 console.log(err, err.stack); // an error occurred
             } else {
+                var execute = true;
                 for (var i = 0; i < data.Workspaces.length; i++) {
-                    var workspaceDetails = data[i];
-                    var describeTagsParams = {
-                        ResourceId: data.Workspaces[i].WorkspaceId
-                    };
+                    if (execute) {
+                        var workspaceDetails = data.Workspaces[i];
+                        var describeTagsParams = {
+                            ResourceId: workspaceDetails.WorkspaceId
+                        };
+                    }
 
-                    workspaces.describeTags(describeTagsParams, function (err, data, workspaceDetails) {
-                        if (err) {
-                            console.log(err, err.stack);
-                        } else {
+                    // console.log("Workspace Details : ", workspaceDetails);
+                    // console.log("describeTagsParameters resource Id: ", describeTagsParams.ResourceId);
+                    // console.log("Data", data);
 
-                            for (var i = 0; i < data.TagList.length; i++) {
+                    if (execute) {
+                        execute = false;
+                        workspaces.describeTags(describeTagsParams, function (err, data, workspaceDetails) {
+                            if (err) {
+                                console.log(err, err.stack);
+                            } else {
 
-                                if (data.TagList[i].Key == "SelfServiceManaged" && data.TagList[i].Value == event.requestContext.authorizer.claims.email) {
-                                    console.log("Desktop for '" + event.requestContext.authorizer.claims.email + "' found: " + describeTagsParams.ResourceId);
 
-                                    var describeDetailsParams = {
-                                        WorkspaceIds: [
-                                            describeTagsParams.ResourceId
-                                        ]
-                                    };
-                                    workspaces.describeWorkspaces(describeDetailsParams, function (err, data) {
+                                for (var j = 0; j < data.TagList.length; j++) {
+                                    // console.log("data taglist", data.TagList[i]);
+                                    // console.log("data taglist index", data.TagList[i].Key);
+                                    // console.log("data taglist value", data.TagList[i].Value);
+                                    // console.log("event", event);
+                                    // console.log("event request context", event.requestContext);
+                                    // console.log("event request context authorizer", event.requestContext.authorizer.claims.email);
+                                    if (data.TagList[j].Key == "SelfServiceManaged" && data.TagList[j].Value == event.requestContext.authorizer.claims.email) {
+                                        console.log("here in the callback - describe tags");
+                                        console.log(workspaceDetails);
+                                        console.log("Desktop for '" + event.requestContext.authorizer.claims.email + "' found: " + describeTagsParams.ResourceId);
 
-                                        if (err) {
-                                            console.log(err, err.stack);
-                                        } else {
-                                            callback(null, {
-                                                "statusCode": 200,
-                                                "body": JSON.stringify(data.Workspaces[0]),
-                                                "headers": {
-                                                    "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
-                                                    "Access-Control-Allow-Methods": "GET,OPTIONS",
-                                                    "Access-Control-Allow-Origin": originURL
-                                                }
-                                            });
-                                        }
-                                    });
+                                        var describeDetailsParams = {
+                                            WorkspaceIds: [
+                                                describeTagsParams.ResourceId
+                                            ]
+                                        };
+                                        workspaces.describeWorkspaces(describeDetailsParams, function (err, data) {
 
+                                            if (err) {
+                                                console.log(err, err.stack);
+                                            } else {
+                                                callback(null, {
+                                                    "statusCode": 200,
+                                                    "body": JSON.stringify(data.Workspaces[0]),
+                                                    "headers": {
+                                                        "Access-Control-Allow-Headers": "Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token",
+                                                        "Access-Control-Allow-Methods": "GET,OPTIONS",
+                                                        "Access-Control-Allow-Origin": originURL
+                                                    }
+                                                });
+                                            }
+                                        });
+
+                                    }
                                 }
-                            }
 
-                        }
-                    });
+                            }
+                        });
+                    }
+
+
                 }
 
             }
@@ -107,7 +126,6 @@ exports.handler = (event, context, callback) => {
                 console.log(err, err.stack);
             } else {
                 console.log("Data: " + JSON.stringify(data));
-
                 console.log("Payload: " + data.Payload);
 
                 for (var i = 0; i < JSON.parse(data.Payload).length; i++) {
@@ -128,7 +146,7 @@ exports.handler = (event, context, callback) => {
         });
 
 
-    } else if (action == "acknowledge") { 
+    } else if (action == "acknowledge") {
         var payloadString = JSON.stringify({
             "action": "put",
             "requesterEmailAddress": event.requestContext.authorizer.claims.email,
@@ -164,7 +182,7 @@ exports.handler = (event, context, callback) => {
 
     } else if (action == "create") {
         // 'create' handles creation by initiating the Step Functions State Machine. The State Machine first sends an email
-        // to the configured Approver email address with two links: one to approve and one to decline. If the Approver declines, 
+        // to the configured Approver email address with two links: one to approve and one to decline. If the Approver declines,
         // the process ends. If the Approver approves, the next State Machine calls another Lambda function 'workspaces-create' that
         // actually handles creating the WorkSpace.
 
@@ -196,7 +214,7 @@ exports.handler = (event, context, callback) => {
             }
         });
     } else if (action == "rebuild") {
-        // 'rebuild' handles rebuilding the WorkSpace assigned to the user that submits the API call. 
+        // 'rebuild' handles rebuilding the WorkSpace assigned to the user that submits the API call.
         // A rebuild function resets the WorkSpace back to its original state. Applications or system settings changes
         // will be lost during a rebuild. The Data Drive is recreated from the last snapshot; snapshots are taken every 12 hours.
 
@@ -271,7 +289,7 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "reboot") {
-        // 'rebuild' handles rebooting the WorkSpace assigned to the user that submits the API call. 
+        // 'rebuild' handles rebooting the WorkSpace assigned to the user that submits the API call.
 
         console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
 
@@ -298,14 +316,14 @@ exports.handler = (event, context, callback) => {
                                     console.log("Rebooting desktop '" + describeTagsParams.ResourceId + " per request.");
 
                                     var rebootParams = {
-                                        RebootWorkspaceRequests: [{
+                                        StartWorkspaceRequests: [{
                                             WorkspaceId: describeTagsParams.ResourceId
                                         }]
                                     };
 
                                     console.log(JSON.stringify(rebootParams));
 
-                                    workspaces.rebootWorkspaces(rebootParams, function (err, data) {
+                                    workspaces.startWorkspaces(rebootParams, function (err, data) {
                                         if (err) {
                                             console.log("Error: " + err);
                                             callback(null, {
@@ -345,7 +363,7 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "delete") {
-        // 'delete' handles deleting the WorkSpace assigned to the user that submits the API call. 
+        // 'delete' handles deleting the WorkSpace assigned to the user that submits the API call.
         // This is a permanent action and cannot be undone. No data will persist after removal.
 
         console.log("Trying to find desktop owned by: " + event.requestContext.authorizer.claims.email);
@@ -420,7 +438,7 @@ exports.handler = (event, context, callback) => {
         });
 
     } else if (action == "bundles") {
-        // 'bundles' handles returning the list of WorkSpaces bundles available to use. The WorkSpaces API only returns a page at a time, so we must recursively 
+        // 'bundles' handles returning the list of WorkSpaces bundles available to use. The WorkSpaces API only returns a page at a time, so we must recursively
         // make the call to describeWorkspaceBundles until NextToken is null.
         // We must make the API call twice to return bundles owned by AMAZON and custom bundles.
 
