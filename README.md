@@ -87,7 +87,7 @@ Deploying the application starts by running the `deploy.json` file inside CloudF
 1. **AppName**: Name of the application that will be used in some components naming scheme.
 2. **BucketName**: Name of the S3 Bucket to create that should house the website. This must be unique within the S3 namespace.
 3. **CognitoPool**: Name of the Cognito Pool to create to use for authentication purposes.
-4. **SAMInputFile**: Serverless transform file. By default, this is the included `sam.json` file. (Don't change unless renaming sam.json)
+4. **SAMInputFile**: Serverless transform file. By default, this is the included `wsportal.json` file. (Don't change unless renaming wsportal.json)
 5. **SAMOutputFile**: The filename for the output file from the buildspec file. (This doesn't need to be changed unless the artifact file inside the `buildspec.yml` file is changed to a different name.)
 6. **CodeBuildImage**: Name of the CodeBuild container image to use. (Don't change unless willing to edit buildspec.yml accordingly.)
 7. **GitHubRepName**: Name of the GitHub repo that houses the application code.
@@ -109,7 +109,7 @@ After initial deployment, the site will not be fully functional as a few configu
 
 #### Manually Create API Gateway
 
-The Serverless Application Model (SAM) within AWS / CloudFormation does not support enabling CORS directly. As such, if using the API Gateway created through that method, it will not work and will consistently through CORS errors in the brower. There is an [open issue](https://github.com/awslabs/serverless-application-model/issues/23) on the SAM GitHub repo, and this will hopefully be added soon in the future. 
+The Serverless Application Model (SAM) within AWS / CloudFormation does not support enabling CORS directly. As such, if using the API Gateway created through that method, it will not work and will consistently throw CORS errors in the brower. There is an [open issue](https://github.com/awslabs/serverless-application-model/issues/23) on the SAM GitHub repo, and this will hopefully be added soon in the future. 
 
 In the meantime, the API Gateway is built manually. To create the API Gateway manually, follow these steps:
 
@@ -162,7 +162,7 @@ The `UserPoolClientId` and `UserPoolId` should be placed into the `website/js/co
 
 #### Configure Approval Email Address
 
-For WorkSpace creation approvals, configure the email address within the `approval.email` entry inside `website/js/confi.js`. This could be an individual address or a Distribution List.
+For WorkSpace creation approvals, configure the email address within the `approval.email` entry inside `website/js/config.js`. This could be an individual address or a Distribution List.
 
 #### Configure Cognito to use Custom Trigger
 
@@ -181,7 +181,7 @@ This will enable limiting signups to the email domain configured in the function
 
 #### Configure App Settings
 
-Edit `sam.json` to update the settings specific to your environment. Simply change the `Default` values under the `Parameters` section.
+Edit `wsportal.json` to update the settings specific to your environment. Simply change the `Default` values under the `Parameters` section.
 
 1. **AppName**: This name will be used within the application components.
 2. **PortalEmail**: This is the email address that approval emails will be sent from.
@@ -201,7 +201,7 @@ In order to provide HTTPS coverage for the portal, create a CloudFront Web Distr
 
 The site should now work as expected. Browse to the URL defined within `OriginURL` output of the parent CloudFormation stack (e.g. http://s3bucketportalname.s3-website-us-east-1.amazonaws.com), and select "Register" from the top right drop-down (Please note that this will be over HTTP and unencrypted at this point). Enter an email address (within the configured domain inside cogDomainVerify) and password, and select Register. You will receive a verification code from Cognito through email. Once the email is received with the token, select "Verify" from the top right drop-down; on the verify page, enter your email and the verification code provided. At this point, the site will redirect to login. Login with the authentication credentials created. To ensure only users within the specified domain can register for the portal, test registering with an email address on an unapproved domain.
 
-On the main page, the ability to request a WorkSpace should now be displayed. Request a WorkSpace with a user (which must exist within the Directory; only include the username itself without any domain information within it) and select a Bundle to use. It should begin the approval process, and the email address configured for approvals should receive an Approval Request email within approximately 10 minutes, which is within time for the CloudWatch Event that triggers the Lambda function polling Step Functions to run (this can be configured lower within `sam.json` for the Lambda function if desired. Approve the request, and the creation process should begin.
+On the main page, the ability to request a WorkSpace should now be displayed. Request a WorkSpace with a user (which must exist within the Directory; only include the username itself without any domain information within it) and select a Bundle to use. It should begin the approval process, and the email address configured for approvals should receive an Approval Request email within approximately 10 minutes, which is within time for the CloudWatch Event that triggers the Lambda function polling Step Functions to run (this can be configured lower within `wsportal.json` for the Lambda function if desired. Approve the request, and the creation process should begin.
 
 The user should receive an email with instructions on how to use their WorkSpace once it finishes provisioning. The user can also log back into the WorkSpaces Portal to try rebooting, rebuilding, or deleting the WorkSpace. Test the ability to perform an activity under WorkSpace Operations on the provisioned WorkSpace.
 
@@ -225,7 +225,7 @@ The code for the pipeline resides within the root of the project, and the pipeli
 
 1. **deploy.json**: Launcher for the core services within CloudFormation (S3, CodePipeline, CodeBuild, Cognito). These are not modified by the pipeline on changes, but it does include setting up the pipeline itself. This is the CloudFormation template to launch to get setup started.
 2. **buildspec.yml**: This file is used by CodeBuild to tell it what to do on every build, such as running jekyll and copying the output to S3.
-3. **sam.json**: CloudFormation Serverless Transformation template for SAM. This template handles creation of the Lambda functions, Step Functions, and the approval API Gateway.
+**wsportal.json**: CloudFormation Serverless Transformation template for SAM. This template handles creation of the Lambda functions, Step Functions, and the approval API Gateway.
 
 ## Notes
 
