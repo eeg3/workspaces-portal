@@ -19,12 +19,12 @@
         "PortalEmail": {
             "Type": "String",
             "Description": "Address from which emails will be sent from to approvers.",
-            "Default": "adminvg@vanguard-infosys.com"
+            "Default": "vgadmin@vanguard-infosys.com"
         },
         "ApproverEmail": {
             "Type": "String",
             "Description": "Email address that will receive WorkSpace Creation approval requests.",
-            "Default": "adminvg@vanguard-infosys.com"
+            "Default": "vgadmin@vanguard-infosys.com"
         },
         "DirectoryServicesId": {
             "Type": "String",
