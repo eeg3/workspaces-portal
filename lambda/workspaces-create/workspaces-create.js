@@ -45,6 +45,8 @@ exports.handler = (event, context, callback) => {
                 Key: 'SelfServiceManaged',
                 Value: requesterEmail
             }, ],
+            RootVolumeEncryptionEnabled: true,
+            UserVolumeEncryptionEnabled: true,
             WorkspaceProperties: {
                 RunningMode: config.Mode,
                 RunningModeAutoStopTimeoutInMinutes: config.UsageTimeout
