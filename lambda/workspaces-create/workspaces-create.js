@@ -47,6 +47,7 @@ exports.handler = (event, context, callback) => {
             }, ],
             RootVolumeEncryptionEnabled: true,
             UserVolumeEncryptionEnabled: true,
+            VolumeEncryptionKey: 'alias/aws/workspaces',
             WorkspaceProperties: {
                 RunningMode: config.Mode,
                 RunningModeAutoStopTimeoutInMinutes: config.UsageTimeout
