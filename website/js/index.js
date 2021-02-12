@@ -39,7 +39,6 @@ var authToken;
 
         var username = $('#reqUsername').val();
         var bundle = $('#reqBundle').val();
-        var region = $('#region').val();
 
         $.ajax({
             method: 'POST',
@@ -53,7 +52,6 @@ var authToken;
                 action: 'create',
                 username: username,
                 bundle: bundle,
-                region: region,
             }),
             contentType: 'text/plain',
             error: function () {
