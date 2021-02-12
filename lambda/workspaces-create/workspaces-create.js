@@ -5,7 +5,9 @@ var AWS = require('aws-sdk');
 
 
 // Create the WorkSpaces service object
-var workspaces;
+var workspaces = new AWS.WorkSpaces({
+    apiVersion: '2015-04-08'
+    });
 
 // WorkSpaces must be tied to a Directory Service ID. Creation of the Directory Service is outside the scope of the portal.
 // By default, all WorkSpaces are configured with 'Auto Stop' mode with a usage timeout of 1 hour.
@@ -30,17 +32,10 @@ exports.handler = (event, context, callback) => {
     var requesterEmail = event.split(",")[0];
     var requesterUsername = event.split(",")[1];
     var requesterBundle = event.split(",")[2];
-    var region = event.split(",")[3];
     
-    workspaces = new AWS.WorkSpaces({
-    apiVersion: '2015-04-08',
-       region: region
-    });
-
     console.log("Requester email: " + requesterEmail);
     console.log("Requester username: " + requesterUsername);
     console.log("Requester bundle: " + requesterBundle);
-    console.log("Requester region: " + region);
 
     var params = {
         Workspaces: [{
