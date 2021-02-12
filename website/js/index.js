@@ -51,7 +51,7 @@ var authToken;
             data: JSON.stringify({
                 action: 'create',
                 username: username,
-                bundle: bundle,
+                bundle: bundle
             }),
             contentType: 'text/plain',
             error: function () {
