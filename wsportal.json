@@ -82,7 +82,7 @@
                 "Handler": "workspaces-create.handler",
                 "Runtime": "nodejs12.x",
                 "CodeUri": "./lambda/workspaces-create/",
-                "Policies": ["AmazonWorkSpacesAdmin", "wsportal_KMSaccess"],
+                "Policies": "AmazonWorkSpacesAdmin",
                 "Environment": {
                     "Variables": {
                         "ORIGIN_URL": {
