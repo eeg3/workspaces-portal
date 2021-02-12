@@ -40,6 +40,7 @@ exports.handler = (event, context, callback) => {
     console.log("Requester email: " + requesterEmail);
     console.log("Requester username: " + requesterUsername);
     console.log("Requester bundle: " + requesterBundle);
+    console.log("Requester region: " + region);
 
     var params = {
         Workspaces: [{
