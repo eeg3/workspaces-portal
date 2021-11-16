@@ -9,6 +9,6 @@
   "author": "Earl Gay",
   "license": "BSD-2-Clause",
   "dependencies": {
-    "aws-sdk": "^2.175.0"
+    "aws-sdk": "^2.814.0"
   }
 }
